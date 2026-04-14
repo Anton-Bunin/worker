@@ -1,0 +1,175 @@
+#tables-container {
+		width: auto; 
+		max-width: 100%;
+		}
+
+		/* Стили специально для ПЕЧАТИ */
+		@media print {
+			@page {
+				size: A4 landscape; /* Альбомная ориентация */
+				margin: 10mm;       /* Отступы страницы */
+			}
+			.controls, button, h1 { display: none !important; } /* Скрываем кнопки и настройки */
+			body { background: white; margin: 0; padding: 0; }
+			.month-wrapper { page-break-inside: avoid; border: none;  padding: 0; margin-bottom: 20px; }
+			
+			table { width: 100%; table-layout: fixed; } /* Фиксируем ширину колонок */
+			th, td { font-size: 10px; padding: 2px !important; } /* Уменьшаем шрифт и отступы */
+			.brigade-col { width: 80px !important; min-width: 80px !important; font-size: 12px; }
+			input { font-size: 10px; }
+		}
+		
+
+	/* 2. Разрешаем основному контейнеру крутиться вниз */
+	#worker {
+		overflow-y: auto; /* Вертикальный скролл */
+		height: auto;
+		min-height: 100%;
+		display: block;
+	}
+	
+	.controls input[type="number"] {
+			width: 60px;    /* Фиксированная небольшая ширина */
+			padding: 4px;
+			margin-right: 10px;
+		}	
+	#month {
+			width: 45px !important;
+	
+		}	
+	
+    body { 
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+		margin: 20px; 
+		background: #f0f2f5; 
+		}
+		
+    .container { 
+		background: white; 
+		padding: 10px; 
+		border-radius: 10px; 
+		box-shadow: 0 4px 6px rgba(0,0,0,0.5); 
+		height: auto;
+		overflow-y: visible; /* Контейнер растет вместе с таблицами */
+		overflow-x: auto;    /* Горизонтальный скролл только если таблица шире экрана */		
+		}
+		
+    table { 
+		margin-left: 0;
+		margin-right: auto;
+		border-collapse: collapse; 
+		width: auto; /* ТАБЛИЦА БОЛЬШЕ НЕ ТЯНЕТСЯ */
+		font-size: 15px; 
+		table-layout: fixed; /* ГАРАНТИРУЕТ СОБЛЮДЕНИЕ ШИРИНЫ СТОЛБЦОВ */
+		}
+		
+    th, td { 
+		border: 1px solid #dee2e6; 
+		padding: 0; /* Убираем падинги, чтобы не распирало */
+		text-align: center; 
+		width: 30px;      /* СТРОГАЯ ШИРИНА СТОЛБЦА ДАТЫ */
+		min-width: 30px;
+		max-width: 30px;
+		height: 30px;	
+		
+		}
+   th { 
+		background: #E8E8E8; 
+		color: #495057; 
+		font-weight: 600; 
+		}
+		
+.brigade-col { 
+    width: 100px !important; 
+    min-width: 100px !important;
+    max-width: 100px !important;
+    text-align: left !important;
+    padding-left: 10px !important;
+    background-color: #fff !important;
+}
+		
+	/* Фиксируем ширину последнего столбца "Итого" */
+	th:last-child, td:last-child {
+			width: 70px !important;
+			min-width: 70px !important;
+		}
+			
+    input { 
+		width: 90%; 
+		border: none; 
+		text-align: center; 
+		outline: none; 
+		background: transparent; 
+		color: #537; 
+		}
+		
+    input:focus { 
+		background: #D1FFFF; 
+		box-shadow: inset 0 0 0 1px #0d6efd; 
+		}
+	.holiday_header {/* Для выходных (Сб, Вс) */ 
+		background: #F5BABA; 
+		} 
+    .holiday_body {/* Для выходных (Сб, Вс) */ 
+		background: #F5E6E6; 
+		}   
+	.controls { 
+		margin-bottom: 10px; 
+		display: flex; 
+		gap: 15px; 
+		align-items: center; 
+		}
+    select, input[type="number"] { 
+		padding: 5px; 
+		border-radius: 4px; 
+		border: 1px solid #ccc; 
+		}
+	.month-wrapper {
+			margin-bottom: 20px; /* Отступ между месяцами */
+			background: white;
+			padding: 10px;
+			border-radius: 8px;
+			text-align: center; 
+		}
+	.month-wrapper h3 {
+			text-transform: capitalize;
+			color: #007bff;
+			margin-top: 0;
+		}    
+		
+	/* Стиль для ячейки текущего дня */
+		.today-cell {
+			background-color: #fff9c4 !important; /* Светло-желтый фон */
+			/*font-style: italic;                   КУРСИВ */
+			font-weight: bold;                   /* Жирный */
+			color: #d32f2f;                      /* Красный цвет текста для акцента */
+		}
+	/* Чтобы инпут внутри тоже стал курсивом */
+		.today-cell input {
+
+			font-weight: bold;
+			color: #d32f2f;
+		}
+.reserved {
+    background-color: #ffcccc !important; /* Светло-красный */
+    cursor: not-allowed;
+    pointer-events: none; /* Нельзя кликнуть повторно */
+}
+
+.clickable {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.clickable:hover {
+    filter: brightness(0.9); /* Слегка затемняем при наведении */
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.shift-row:hover {
+    background-color: #f0f0f0; /* Подсветка при наведении */
+}
+.shift-row.reserved {
+    background-color: #d4edda;
+    color: #155724;
+    pointer-events: none; /* Запрет повторного клика */
+}

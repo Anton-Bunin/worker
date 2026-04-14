@@ -1,0 +1,212 @@
+/**
+ * Данные графиков бригад
+ */
+const schedules = {
+    1: { start: '2024-12-30', pattern: ['Д', 'Д', '', 'Н', 'Н', '', '', ''] },
+    2: { start: '2025-01-01', pattern: ['Д', 'Д', '', 'Н', 'Н', '', '', ''] },
+    3: { start: '2025-01-03', pattern: ['Д', 'Д', '', 'Н', 'Н', '', '', ''] },
+    4: { start: '2024-12-28', pattern: ['Д', 'Д', '', 'Н', 'Н', '', '', ''] }
+};
+
+// Получаем брони из Nextcloud
+//const savedBookings = OC.getInitialState('worker', 'bookings') || [];
+
+// Читаем данные из скрытого дива
+const dataEl = document.getElementById('server-data');
+const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
+
+console.log("Загруженные бронирования:", savedBookings);
+
+/**
+ * Основная функция отрисовки
+ */
+function render() {
+    const monthInput = document.getElementById('month');
+    const yearInput = document.getElementById('year');
+    const monthsCountInput = document.getElementById('monthsCount');
+    const daysFilterInput = document.getElementById('daysFilter');
+
+    if (!monthInput || !yearInput) return;
+
+    const month = parseInt(monthInput.value);
+    const year = parseInt(yearInput.value);
+    const monthsCount = parseInt(monthsCountInput.value) || 1;
+    const daysFilter = daysFilterInput.value || "";
+
+    const container = document.getElementById('tables-container');
+    container.innerHTML = ''; 
+
+    for (let i = 0; i < monthsCount; i++) {
+        const currentMonth = ((month + i - 1) % 12) + 1;
+        const currentYear = year + Math.floor((month + i - 1) / 12);
+        container.appendChild(createTable(currentMonth, currentYear, daysFilter));
+    }
+}
+
+function createTable(month, year, daysFilter) {
+    const table = document.createElement('table');
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+
+    let filteredDays = [];
+    if (daysFilter.trim() !== "") {
+        filteredDays = daysFilter.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+    }
+
+    let html = `<thead><tr><th colspan="${(filteredDays.length > 0 ? filteredDays.length : daysInMonth) + 2}" class="month-title">${monthNames[month - 1]} ${year} Г.</th></tr>`;
+    html += `<tr><th class="brigade-col">Бригада</th>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        if (filteredDays.length === 0 || filteredDays.includes(d)) {
+            const date = new Date(year, month - 1, d);
+            const dayOfWeek = date.getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            html += `<th class="${isWeekend ? 'weekend' : ''}">${d}</th>`;
+        }
+    }
+    html += `<th>Итого</th></tr></thead><tbody>`;
+
+    for (let bId in schedules) {
+        html += `<tr><td class="brigade-col">Бриг. № ${bId}</td>`;
+        let dayCount = 0;
+        let nightCount = 0;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+    //        const res = getBrigadeForDay(bId, d, month, year);
+			let res = getBrigadeForDay(bId, d, month, year);
+            if (res === 'Д') dayCount++;
+            if (res === 'Н') nightCount++;
+
+            if (filteredDays.length === 0 || filteredDays.includes(d)) {
+                let cellClass = '';
+                if (res === 'Д') cellClass = 'day';
+                if (res === 'Н') cellClass = 'night';
+                
+                if (res === 'Д' || res === 'Н') {
+                    cellClass += ' clickable';
+                }
+
+                const dStr = String(d).padStart(2, '0');
+                const mStr = String(month).padStart(2, '0');
+                const dateStr = `${year}-${mStr}-${dStr}`;
+
+				// Ищем, есть ли бронь на эту дату и бригаду
+				const booking = savedBookings.find(b => b.shift_date === dateStr && b.brigade_id == bId);
+
+				if (booking) {
+					cellClass += ' reserved'; // Добавь этот класс в CSS (например, красный фон)
+					res = 'X'; // Или оставь Д/Н, но с пометкой
+				}
+
+                html += `<td class="${cellClass}" data-date="${dateStr}" data-brigade="${bId}" data-type="${res}">${res}</td>`;
+            }
+        }
+        html += `<td class="total">У:${dayCount} Н:${nightCount}</td></tr>`;
+    }
+
+    html += `</tbody>`;
+    table.innerHTML = html;
+    return table;
+}
+
+function getBrigadeForDay(bId, day, month, year) {
+    const config = schedules[bId];
+    if (!config) return '';
+    const startDate = new Date(config.start);
+    const currentDate = new Date(year, month - 1, day);
+    const diffTime = currentDate - startDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return '';
+    return config.pattern[diffDays % config.pattern.length];
+}
+
+/**
+ * Логика бронирования
+ */
+function reserveShift(date, brigade, type, element) {
+    const typeName = (type === 'Д') ? "ДНЕВНУЮ" : "НОЧНУЮ";
+    
+    if (confirm(`Забронировать ${typeName} смену на ${date}?`)) {
+        console.log("Попытка отправки запроса...");
+
+        // Формируем URL. Убедись, что 'worker' — это твой ID приложения!
+        const url = OC.generateUrl('/apps/worker/reserve');
+        console.log("URL запроса:", url);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'requesttoken': OC.requestToken
+            },
+            body: JSON.stringify({
+                date: date,
+                brigade: parseInt(brigade),
+                type: type
+            })
+        })
+        .then(response => {
+            console.log("Статус ответа от сервера:", response.status);
+            if (!response.ok) {
+                // Если сервер вернул 404 или 500, выведем текст ошибки
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Данные от сервера:", data);
+            if (data.status === 'success') {
+                element.style.backgroundColor = "#d4edda";
+                alert("Ура! Записано в базу данных.");
+            } else {
+                alert("Сервер ответил, но что-то не так: " + JSON.stringify(data));
+            }
+        })
+        .catch(err => {
+            console.error("Критическая ошибка запроса:", err);
+            alert("Ошибка связи с сервером. Проверь консоль (F12).");
+        });
+    }
+}
+
+/**
+ * Инициализация
+ */
+function initApp() {
+    // 1. Ставим дату по умолчанию
+    const mInput = document.getElementById('month');
+    const yInput = document.getElementById('year');
+    if (mInput && !mInput.value) {
+        const now = new Date();
+        mInput.value = now.getMonth() + 1;
+        yInput.value = now.getFullYear();
+    }
+
+    // 2. Слушаем изменения полей
+    ['month', 'year', 'monthsCount', 'daysFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', render);
+    });
+
+    // 3. Слушаем клики по таблице (Делегирование)
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('clickable')) {
+            const date = e.target.getAttribute('data-date');
+            const brigade = e.target.getAttribute('data-brigade');
+            const type = e.target.getAttribute('data-type');
+            reserveShift(date, brigade, type, e.target);
+        }
+    });
+
+    render();
+}
+
+// Поехали!
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+window.render = render;
