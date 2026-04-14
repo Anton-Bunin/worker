@@ -147,16 +147,9 @@ function reserveShift(date, brigade, type, element) {
 				type: type
 			})
 		})
-		.then(response => {
-			console.log("Статус ответа от сервера:", response.status);
-			if (!response.ok) {
-				// Если сервер вернул 404 или 500, выведем текст ошибки
-				return response.text().then(text => { throw new Error(text) });
-			}
-			return response.json();
-		})
+		.then(response => response.json())
 		.then(data => {
-			console.log("Данные от сервера:", data);
+	//		console.log("Данные от сервера:", data);
 			if (data.status === 'success') {
 				element.style.backgroundColor = "#d4edda";
 				alert("Запись сохранена.");
@@ -164,12 +157,12 @@ function reserveShift(date, brigade, type, element) {
 			} else {
 			        // Если сервер вернул ошибку (например, "Лимит превышен"), 
 			        // она придет в data.message и покажется здесь:
-			        alert("Ошибка: " + (data.message || JSON.stringify(data)));
+			       alert(data.message); 
 			}
 		})
 		.catch(err => {
-			console.error("Критическая ошибка запроса:", err);
-			alert("Ошибка связи с сервером. Проверь консоль (F12).");
+			console.error(err);
+			alert("Произошла ошибка при выполнении запроса");
 		});
 	}
 }
