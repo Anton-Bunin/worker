@@ -5,7 +5,7 @@
 	<name>W O R K E R</name>
 	<summary>Табель бронирования</summary>
 	<description>Приложение для резервирования вахт и бригад.</description>
-	<version>1.4.0</version>
+	<version>1.5.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="cccpnowar@gmail.com" homepage="">Anton Bunin</author>
 	<namespace>WORKER</namespace>
