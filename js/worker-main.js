@@ -17,7 +17,7 @@ const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) 
 const currentUserId = dataEl.getAttribute('data-current-user');
 
 console.log("Загруженные бронирования:", savedBookings);
-
+//=============================================================================
 /**
  * Основная функция отрисовки
  */
@@ -43,7 +43,7 @@ function render() {
 		container.appendChild(createTable(currentMonth, currentYear, daysFilter));
 	}
 }
-
+//=============================================================================
 function createTable(month, year, daysFilter) {
 	const table = document.createElement('table');
 	const daysInMonth = new Date(year, month, 0).getDate();
@@ -109,7 +109,7 @@ function createTable(month, year, daysFilter) {
 	table.innerHTML = html;
 	return table;
 }
-
+//=============================================================================
 function getBrigadeForDay(bId, day, month, year) {
 	const config = schedules[bId];
 	if (!config) return '';
@@ -121,7 +121,7 @@ function getBrigadeForDay(bId, day, month, year) {
 	if (diffDays < 0) return '';
 	return config.pattern[diffDays % config.pattern.length];
 }
-
+//=============================================================================
 /**
  * Логика бронирования
  */
@@ -159,9 +159,12 @@ function reserveShift(date, brigade, type, element) {
 			console.log("Данные от сервера:", data);
 			if (data.status === 'success') {
 				element.style.backgroundColor = "#d4edda";
-				alert("Ура! Записано в базу данных.");
+				alert("Запись сохранена.");
+				location.reload();
 			} else {
-				alert("Сервер ответил, но что-то не так: " + JSON.stringify(data));
+			        // Если сервер вернул ошибку (например, "Лимит превышен"), 
+			        // она придет в data.message и покажется здесь:
+			        alert("Ошибка: " + (data.message || JSON.stringify(data)));
 			}
 		})
 		.catch(err => {
@@ -170,7 +173,7 @@ function reserveShift(date, brigade, type, element) {
 		});
 	}
 }
-
+//=============================================================================
 /**
  * Инициализация
  */
@@ -202,7 +205,7 @@ function initApp() {
 
 	render();
 }
-
+//=============================================================================
 // Поехали!
 if (document.readyState === 'loading') {
 	document.addEventListener('DOMContentLoaded', initApp);
