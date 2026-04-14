@@ -34,38 +34,59 @@ class PageController extends Controller
 			$this->initialStateService = $initialStateService;
 	}
 //=====================================================================================================
-	#[NoCSRFRequired]
-	#[NoAdminRequired]
-	public function reserve(string $date, int $brigade, string $type): JSONResponse 
-	{
-		try {
-		$user = $this->userSession->getUser();
-		$userId = $user->getUID();
-			
+     /**
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     */
+    public function reserve(string $date, int $brigade, string $type): JSONResponse {
+        try {
+            $user = $this->userSession->getUser();
+            if ($user === null) {
+                return new JSONResponse(['status' => 'error', 'message' => 'User not logged in'], 403);
+            }
+            $userId = $user->getUID();
 
+            // --- НАСТРОЙКА ЛИМИТА ---
+            $maxShifts = 5; // Поменяй на нужное тебе число
+            // ------------------------
 
-		   if ($user === null) {
-				return new JSONResponse(['status' => 'error', 'message' => 'User not logged in'], 403);
-			}
-			$userId = $user->getUID();
+            // Считаем, сколько смен уже занял этот юзер в месяце выбранной даты
+            $month = date('m', strtotime($date));
+            $year = date('Y', strtotime($date));
+            $monthPattern = $year . '-' . $month . '-%';
 
-			$qb = $this->db->getQueryBuilder();
-			$qb->insert('worker_bookings')
-				->values([
-					'user_id' => $qb->createNamedParameter($userId),
-					'shift_date' => $qb->createNamedParameter($date),
-					'brigade_id' => $qb->createNamedParameter($brigade),
-					'shift_type' => $qb->createNamedParameter($type),
-				]);
+            $qb = $this->db->getQueryBuilder();
+            $qb->select($qb->func()->count('*', 'cnt'))
+                ->from('worker_bookings')
+                ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+                ->andWhere($qb->expr()->like('shift_date', $qb->createNamedParameter($monthPattern)));
+            
+            $count = $qb->executeQuery()->fetchOne();
 
-			// ИСПРАВЛЕНИЕ: Используем executeStatement() вместо execute()
-			$qb->executeStatement();
+            if ($count >= $maxShifts) {
+                return new JSONResponse([
+                    'status' => 'error', 
+                    'message' => 'Превышен лимит! Можно занять не более ' . $maxShifts . ' смен в месяц.'
+                ], 403);
+            }
 
-			return new JSONResponse(['status' => 'success']);
-		} catch (\Exception $e) {
-			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
-		}
-	}
+            // Если лимит не превышен, записываем
+            $qb = $this->db->getQueryBuilder();
+            $qb->insert('worker_bookings')
+                ->values([
+                    'user_id' => $qb->createNamedParameter($userId),
+                    'shift_date' => $qb->createNamedParameter($date),
+                    'brigade_id' => $qb->createNamedParameter($brigade),
+                    'shift_type' => $qb->createNamedParameter($type),
+                ]);
+            
+            $qb->executeStatement();
+
+            return new JSONResponse(['status' => 'success']);
+        } catch (\Exception $e) {
+            return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
 //=====================================================================================================
 	#[NoCSRFRequired]
 	#[NoAdminRequired]
