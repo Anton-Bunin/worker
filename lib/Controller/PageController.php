@@ -123,21 +123,17 @@ class PageController extends Controller
 	 */
 	public function cancel(string $date, int $brigade): JSONResponse 
 	{
-		try {
-			$userId = $this->userSession->getUser()->getUID();
-
-			$qb = $this->db->getQueryBuilder();
-			$qb->delete('worker_bookings')
-				->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
-				->andWhere($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
-				->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
-			
-			$qb->executeStatement();
-
-			return new JSONResponse(['status' => 'success']);
-		} catch (\Exception $e) {
-			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
-		}
+		 $userId = $this->userId;
+	
+	    // Проверяем, существует ли бронь и принадлежит ли она пользователю
+	    $query = $this->db->getQueryBuilder();
+	    $query->delete('worker_bookings')
+	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)))
+	          ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
+	
+	    $result = $query->execute();
+	
+	    return new DataResponse(['status' => 'success', 'deleted' => $result > 0])
 	}
 //=====================================================================================================
 }
