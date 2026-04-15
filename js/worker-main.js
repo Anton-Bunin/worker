@@ -16,6 +16,8 @@ const dataEl = document.getElementById('server-data');
 const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
 const currentUserId = dataEl.getAttribute('data-current-user');
 
+const bookingId = target.dataset.id; // Предположим, ты хранишь ID записи в DOM
+
 console.log("Загруженные бронирования:", savedBookings);
 //=============================================================================
 /**
