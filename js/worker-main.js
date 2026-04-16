@@ -176,32 +176,44 @@ function reserveShift(date, brigade, type, element) {
  * Инициализация
  */
 function initApp() {
-	// 1. Ставим дату по умолчанию
-	const mInput = document.getElementById('month');
-	const yInput = document.getElementById('year');
-	if (mInput && !mInput.value) {
-		const now = new Date();
-		mInput.value = now.getMonth() + 1;
-		yInput.value = now.getFullYear();
-	}
+    // 0. Получаем данные от бэкенда (те самые, что передали через InitialState)
+    const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
 
-	// 2. Слушаем изменения полей
-	['month', 'year', 'monthsCount', 'daysFilter'].forEach(id => {
-		const el = document.getElementById(id);
-		if (el) el.addEventListener('input', render);
-	});
+    const mInput = document.getElementById('month');
+    const yInput = document.getElementById('year');
+    if (mInput && !mInput.value) {
+        const now = new Date();
+        mInput.value = now.getMonth() + 1;
+        yInput.value = now.getFullYear();
+    }
 
-	// 3. Слушаем клики по таблице (Делегирование)
-	document.addEventListener('click', function(e) {
-		if (e.target && e.target.classList.contains('clickable')) {
-			const date = e.target.getAttribute('data-date');
-			const brigade = e.target.getAttribute('data-brigade');
-			const type = e.target.getAttribute('data-type');
-			reserveShift(date, brigade, type, e.target);
-		}
-	});
+    ['month', 'year', 'monthsCount', 'daysFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', render);
+    });
 
-	render();
+    // 3. Слушаем клики по таблице (Делегирование)
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('.clickable'); // Используем closest для точности
+        if (!target) return;
+
+        const bookingId = target.getAttribute('data-id'); // Проверяем, есть ли уже бронь
+
+        if (bookingId) {
+            // Если ID есть — это УДАЛЕНИЕ
+            if (confirm('Удалить вашу запись?')) {
+                cancelShift(bookingId, target);
+            }
+        } else {
+            // Если ID нет — это ЗАПИСЬ (твой старый метод)
+            const date = target.getAttribute('data-date');
+            const brigade = target.getAttribute('data-brigade');
+            const type = target.getAttribute('data-type');
+            reserveShift(date, brigade, type, target);
+        }
+    });
+
+    render();
 }
 //=============================================================================
 // Поехали!
