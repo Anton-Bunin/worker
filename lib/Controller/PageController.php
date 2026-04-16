@@ -104,8 +104,7 @@ class PageController extends Controller
 		   ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
 		$bookings = $qb->executeQuery()->fetchAll();
 		
-		// Вот эта строка ПРАВИЛЬНО передает данные в JS:
-		\OC::server()->getInitialStateService()->provideInitialState('worker', 'bookings_data', [
+		$this->initialStateService->provideInitialState('worker', 'bookings_data', [
 		    'bookings' => $bookings,
 		    'currentUserId' => $this->userId
 		]);
