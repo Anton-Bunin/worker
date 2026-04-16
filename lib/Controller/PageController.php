@@ -96,25 +96,21 @@ class PageController extends Controller
 	{
 		\OCP\Util::addStyle('worker', 'worker-main');
 		\OCP\Util::addScript('worker', 'worker-main');
-		
-		 // Получаем все бронирования
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')->from('worker_bookings');
-		$result = $qb->executeQuery();
-		$bookings = $result->fetchAll();
-		
-		// Передаем их во фронтенд
-		//$this->initialStateService->provideInitialState('worker', 'bookings', $bookings);
+	 
+		// Получаем бронирования вместе с именами пользователей
+	    $qb = $this->db->getQueryBuilder();
+	    $qb->select('b.*', 'u.displayname')
+	       ->from('worker_bookings', 'b')
+	       ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
+	    
+	    $bookings = $qb->executeQuery()->fetchAll();
+	
+	    // Возвращаем ОДИН ответ с данными
+	    return new TemplateResponse(Application::APP_ID, 'index', [
+	        'bookings' => $bookings,
+	        'currentUserId' => $this->userId
+	    ]);	
 
-		// Передаем массив напрямую в шаблон
-		return new TemplateResponse(Application::APP_ID, 'index', [
-			'bookings' => $bookings
-		]);
-
-		return new TemplateResponse(
-			Application::APP_ID,
-			'index',
-		);
 	}
 //=====================================================================================================
 	/**
