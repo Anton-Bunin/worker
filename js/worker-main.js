@@ -18,6 +18,9 @@ const currentUserId = dataEl.getAttribute('data-current-user');
 
 const bookingId = target.dataset.id; // Предположим, ты хранишь ID записи в DOM
 
+const workerData = OC.generateInitialState('worker', 'bookings_data');
+console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
+
 console.log("Загруженные бронирования:", savedBookings);
 //=============================================================================
 /**
