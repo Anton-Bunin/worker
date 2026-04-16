@@ -9,14 +9,6 @@ Util::addStyle('worker', 'worker-main');
 
 ?>
 
-<script>
-    // Передаем данные из контроллера в глобальную переменную браузера
-    window.workerData = {
-        bookings: <?php echo json_encode($_['bookings']); ?>,
-        currentUserId: <?php echo json_encode($_['currentUserId'] ?? ''); ?>
-    };
-</script>
-
 <div id="worker">
 
     <title>Табель</title>
