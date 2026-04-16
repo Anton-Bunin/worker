@@ -92,25 +92,25 @@ class PageController extends Controller
 	#[NoAdminRequired]
 	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
 	#[FrontpageRoute(verb: 'GET', url: '/')]
+	
 	public function index(): TemplateResponse 
 	{
 		\OCP\Util::addStyle('worker', 'worker-main');
 		\OCP\Util::addScript('worker', 'worker-main');
 	 
-		// Получаем бронирования вместе с именами пользователей
-	    $qb = $this->db->getQueryBuilder();
-	    $qb->select('b.*', 'u.displayname')
-	       ->from('worker_bookings', 'b')
-	       ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
-	    
-	    $bookings = $qb->executeQuery()->fetchAll();
-	
-	    // Возвращаем ОДИН ответ с данными
-	    return new TemplateResponse(Application::APP_ID, 'index', [
-	        'bookings' => $bookings,
-	        'currentUserId' => $this->userId
-	    ]);	
-
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('b.*', 'u.displayname')
+		   ->from('worker_bookings', 'b')
+		   ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
+		$bookings = $qb->executeQuery()->fetchAll();
+		
+		// Вот эта строка ПРАВИЛЬНО передает данные в JS:
+		\OC::server()->getInitialStateService()->provideInitialState('worker', 'bookings_data', [
+		    'bookings' => $bookings,
+		    'currentUserId' => $this->userId
+		]);
+		
+		return new TemplateResponse('worker', 'index');
 	}
 //=====================================================================================================
 	/**
