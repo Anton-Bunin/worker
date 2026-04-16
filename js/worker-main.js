@@ -215,6 +215,23 @@ function initApp() {
 
     render();
 }
+//==========================================================================================
+function cancelShift(id, element) {
+    fetch(OC.generateUrl('/apps/worker/cancel/' + id), {
+        method: 'POST',
+        headers: {
+            'requesttoken': OC.requestToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            element.classList.remove('booked');
+            element.removeAttribute('data-id');
+            element.innerHTML = element.getAttribute('data-day'); // Возвращаем только число
+        }
+    });
+}
 //=============================================================================
 // Поехали!
 if (document.readyState === 'loading') {
