@@ -133,7 +133,7 @@ class PageController extends Controller
 	
 	    $result = $query->execute();
 	
-	    return new DataResponse(['status' => 'success', 'deleted' => $result > 0])
+	    return new DataResponse(['status' => 'success', 'deleted' => $result > 0]);
 	}
 //=====================================================================================================
 }
