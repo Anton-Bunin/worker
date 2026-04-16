@@ -20,7 +20,7 @@ Util::addStyle('worker', 'worker-main');
 		<label>Год: <input type="number" id="year"></label>
 		<label>Месяцев: <input type="number" id="monthsCount" min="1" max="12" value="3"></label>
 		<label>Дни: <input type="text" id="daysFilter" placeholder="1,5,24" style="width: 100px;"></label>
-		<button id="refresh-btn">Обновить</button>
+		<button id="refresh-btn">Обновить!</button>
 	</div>
 
    <div id="tables-container"></div>
