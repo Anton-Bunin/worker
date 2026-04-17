@@ -268,7 +268,8 @@ function cancelShift(id, element) {
         if (data.status === 'success') {
             element.classList.remove('booked');
             element.removeAttribute('data-id');
-            element.innerHTML = element.getAttribute('data-day') || element.getAttribute('data-type');
+			element.innerHTML = element.getAttribute('data-day') || element.getAttribute('data-type') || '';
+			location.reload(); 
         }
     });
 }
