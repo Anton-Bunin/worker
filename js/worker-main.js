@@ -15,10 +15,9 @@ const schedules = {
 const dataEl = document.getElementById('server-data');
 const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
 const currentUserId = dataEl.getAttribute('data-current-user');
+let workerData = { bookings: [] }; 
 
-const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
 console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
-
 console.log("Загруженные бронирования:", savedBookings);
 //=============================================================================
 /**
@@ -180,8 +179,12 @@ function reserveShift(date, brigade, type, element) {
  */
 function initApp() {
     // 0. Получаем данные от бэкенда (те самые, что передали через InitialState)
-  //  const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
-
+    try {
+        workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
+    } catch (e) {
+        console.error("Nextcloud OC object not ready yet", e);
+    }
+	
     const mInput = document.getElementById('month');
     const yInput = document.getElementById('year');
     if (mInput && !mInput.value) {
