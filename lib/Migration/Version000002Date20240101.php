@@ -1,4 +1,3 @@
-php
 <?php
 namespace OCA\Worker\Migration;
 
