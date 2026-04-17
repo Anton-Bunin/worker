@@ -31,10 +31,10 @@ Util::addStyle('worker', 'worker-main');
 	</table>
 	
    <!-- Место для списка бронирований -->
-   <div id="bookings-list-container" style="margin-top: 30px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
-       <h3>Текущие бронирования:</h3>
-       <div id="bookings-list-content"></div>
-   </div>	
+	<div id="bookings-list-container" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; max-width: 600px;">
+	    <h3 style="margin-top: 0;">Текущие бронирования:</h3>
+	    <div id="bookings-list-content"></div>
+	</div>
 	
 </div>
 
