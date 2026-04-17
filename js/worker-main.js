@@ -221,11 +221,7 @@ function initApp() {
 		const isAdmin = window.workerData && window.workerData.isAdmin; 
 
         if (bookingId) {
-            // // Если ID есть — это УДАЛЕНИЕ
-            // if (confirm('Удалить вашу запись?')) {
-            //     cancelShift(bookingId, target);
-            // }
-
+			 alert(`Это админ?: ${isAdmin}`);
 			// ПРОВЕРКА: Удалять может ТОЛЬКО админ
 	        if (isAdmin === true) { 
 	            if (confirm('Удалить эту запись (права администратора)?')) {
@@ -262,15 +258,6 @@ function cancelShift(id, element) {
     })
 	.then(data => {
 	    if (data.status === 'success') {
-	        // 1. Убираем визуальные признаки брони
-	        // element.classList.remove('booked');
-	        // element.removeAttribute('data-id');
-	        
-	        // // 2. Возвращаем букву Д или Н
-	        // element.innerHTML = element.getAttribute('data-type') || '';
-	        
-	        // 3. ОБЯЗАТЕЛЬНО: удаляем эту запись из памяти JS, 
-	        // чтобы она не появилась снова при нажатии кнопок фильтров или смены месяца
 	        if (window.workerData && window.workerData.bookings) {
 	            window.workerData.bookings = window.workerData.bookings.filter(b => b.id != id);
 	        }	
