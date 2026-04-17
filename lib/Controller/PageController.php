@@ -127,7 +127,10 @@ class PageController extends Controller
 	          ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
 	
 	    $result = $query->execute();
-		return new DataResponse(['status' => 'success']);
+        return new DataResponse([
+            'status' => 'success',
+            'deleted' => $result > 0
+        ]);
 	}
 //=====================================================================================================
 }
