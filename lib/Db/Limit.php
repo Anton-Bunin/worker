@@ -6,9 +6,9 @@ use OCP\AppFramework\Db\Entity;
 class Limit extends Entity {
     // Эти переменные должны называться так же, как колонки в базе,
     // но в формате camelCase (shift_date -> shiftDate)
-    protected $shiftDate;
-    protected $brigadeId;
-    protected $maxSlots;
+    public $shiftDate;
+    public $brigadeId;
+    public $maxSlots;
 
     public function __construct() {
         // Указываем типы данных для Nextcloud
