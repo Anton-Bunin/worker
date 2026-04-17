@@ -123,8 +123,8 @@ class PageController extends Controller
 	
 	    $query = $this->db->getQueryBuilder();
 	    $query->delete('worker_bookings')
-	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)))
-	          ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
+	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)));
+	         // ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
 	
 	    $result = $query->executeStatement(); // Вместо execute()
         return new DataResponse([
