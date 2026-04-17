@@ -109,6 +109,14 @@ class PageController extends Controller
 		    'bookings' => $bookings,
 		    'currentUserId' => $this->userId
 		]);
+
+		   $isAdmin = \OC::$server->getGroupManager()->isAdmin($this->userId);
+		
+		    $this->initialStateService->provideInitialState('worker', 'bookings_data', [
+		        'bookings' => $bookings,
+		        'currentUserId' => $this->userId,
+		        'isAdmin' => $isAdmin // Передаем результат проверки (true/false)
+		    ]);
 		
 		return new TemplateResponse('worker', 'index');
 	}
