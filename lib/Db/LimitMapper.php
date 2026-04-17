@@ -1,5 +1,5 @@
 <?php
-namespace OCA\Worker\Db;
+namespace OCA\WORKER\Db;
 
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
