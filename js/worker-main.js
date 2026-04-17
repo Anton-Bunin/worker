@@ -11,10 +11,10 @@ const schedules = {
 // Получаем брони из Nextcloud
 //const savedBookings = OC.getInitialState('worker', 'bookings') || [];
 
-// Читаем данные из скрытого дива
-const dataEl = document.getElementById('server-data');
-//const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
-const currentUserId = dataEl.getAttribute('data-current-user');
+// // Читаем данные из скрытого дива
+// const dataEl = document.getElementById('server-data');
+// //const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
+// const currentUserId = dataEl.getAttribute('data-current-user');
 let workerData = { bookings: [] }; 
 
 //console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
