@@ -195,7 +195,15 @@ function initApp() {
     
     if (stateElement) {
         try {
-            window.workerData = JSON.parse(stateElement.value);
+            // 1. Читаем значение
+            let rawData = stateElement.value;
+            // 2. Если строка начинается не с '{', значит она в base64 — декодируем
+            if (rawData.charAt(0) !== '{') {
+                rawData = atob(rawData);
+            }
+            // 3. Теперь парсим
+            window.workerData = JSON.parse(rawData);
+            console.log("Данные успешно расшифрованы и загружены:", window.workerData);
         } catch (e) {
             console.error("Ошибка парсинга данных:", e);
             window.workerData = { bookings: [] };
