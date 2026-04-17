@@ -259,5 +259,5 @@ $(document).ready(function() {
         }
     });
  initApp(); 
-	
+});	
 window.render = render;
