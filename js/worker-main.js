@@ -47,6 +47,8 @@ function createTable(month, year, daysFilter) {
 	 // Если workerData не загрузился, используем пустой массив, чтобы не падать
     const savedBookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
 
+	console.log('Проверка лимитов:', OCP.InitialState.loadState('worker', 'limits_data'));
+
 	let filteredDays = [];
 	if (daysFilter.trim() !== "") {
 		filteredDays = daysFilter.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
