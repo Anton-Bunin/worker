@@ -113,6 +113,7 @@ function createTable(month, year, daysFilter) {
 				// Генерируем строку ячейки ОДНИМ куском
 				html += `<td class="${cellClass}${extraClass}" 
 				             ${dataIdAttr} 
+				             data-day="${d}" 
 				             data-date="${dateStr}" 
 				             data-brigade="${bId}" 
 				             data-type="${res}">
