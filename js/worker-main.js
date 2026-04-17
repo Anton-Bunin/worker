@@ -190,7 +190,6 @@ function initApp() {
         try {
             let rawData = stateElement.value;
             if (rawData.charAt(0) !== '{') rawData = atob(rawData);
-            // ПРИСВАИВАЕМ В window.workerData, чтобы функция render его увидела
             window.workerData = JSON.parse(rawData); 
         } catch (e) {
             console.error("Ошибка парсинга данных:", e);
@@ -221,9 +220,8 @@ function initApp() {
 		const isAdmin = window.workerData && window.workerData.isAdmin; 
 
         if (bookingId) {
-			 alert(`Это админ?: ${isAdmin}`);
 			// ПРОВЕРКА: Удалять может ТОЛЬКО админ
-	        if (isAdmin === true) { 
+	        if (String(window.workerData.isAdmin) === true) { 
 	            if (confirm('Удалить эту запись (права администратора)?')) {
 	                cancelShift(bookingId, target);
 	            }
