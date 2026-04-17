@@ -194,7 +194,7 @@ function initApp() {
     // Используем прямой поиск по ID, который генерирует Nextcloud
     // Формат ID всегда такой: initial-state-[app_id]-[key]
     const stateElement = document.getElementById('initial-state-worker-bookings_data');
-    
+
     if (stateElement) {
         try {
             // 1. Читаем значение
@@ -232,15 +232,28 @@ function initApp() {
     // 3. Слушаем клики по таблице (Делегирование)
     document.addEventListener('click', function(e) {
         const target = e.target.closest('.clickable'); // Используем closest для точности
+	    const currentUserId = window.workerData.currentUserId; // Твой ID из InitialState
+		
         if (!target) return;
 
         const bookingId = target.dataset.id; 
 
         if (bookingId) {
-            // Если ID есть — это УДАЛЕНИЕ
-            if (confirm('Удалить вашу запись?')) {
-                cancelShift(bookingId, target);
-            }
+            // // Если ID есть — это УДАЛЕНИЕ
+            // if (confirm('Удалить вашу запись?')) {
+            //     cancelShift(bookingId, target);
+            // }
+
+			// ПРОВЕРКА: Удалять может ТОЛЬКО админ
+	        if (currentUserId === 'admin') { 
+	            if (confirm('Удалить эту запись (права администратора)?')) {
+	                cancelShift(bookingId, target);
+	            }
+	        } else {
+	            // Обычный пользователь кликнул на занятую ячейку
+	            alert('Запись уже создана. Для отмены обратитесь к администратору.');
+	        }
+			
         } else {
             // Если ID нет — это ЗАПИСЬ (твой старый метод)
             const date = target.getAttribute('data-date');
