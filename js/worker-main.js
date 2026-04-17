@@ -99,7 +99,8 @@ function createTable(month, year, daysFilter) {
 				if (booking) {
 				    extraClass = ' booked'; // Подсвечиваем забронированное
 				    dataIdAttr = `data-id="${booking.id}"`; // ID для удаления
-				    cellContent = booking.displayname; // ИМЯ (Задача №2)
+				    // cellContent = booking.displayname; // ИМЯ (Задача №2)
+					cellContent = 'X';
 				}
 				
 				// Генерируем строку ячейки ОДНИМ куском
