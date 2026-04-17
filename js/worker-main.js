@@ -195,8 +195,8 @@ function initApp() {
             console.error("Ошибка парсинга данных:", e);
         }
     }
-	alert("Сервер говорит, что мой ID: " + window.workerData.currentUserId);
-    alert("Сервер говорит, я админ?: " + window.workerData.isAdmin);
+	console.log("Сервер говорит, что мой ID: " + window.workerData.currentUserId);
+    console.log("Сервер говорит, я админ?: " + window.workerData.isAdmin);
     console.log("Данные успешно загружены:", window.workerData);	
 	
     const mInput = document.getElementById('month');
