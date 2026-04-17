@@ -116,11 +116,10 @@ class PageController extends Controller
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function cancel(string $date, int $brigade): JSONResponse 
+	public function cancel(int $id): DataResponse 
 	{
-		 $userId = $this->userId;
+	    $userId = $this->userId;
 	
-	    // Проверяем, существует ли бронь и принадлежит ли она пользователю
 	    $query = $this->db->getQueryBuilder();
 	    $query->delete('worker_bookings')
 	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)))
@@ -128,7 +127,10 @@ class PageController extends Controller
 	
 	    $result = $query->execute();
 	
-	    return new DataResponse(['status' => 'success', 'deleted' => $result > 0]);
+	    return new DataResponse([
+	        'status' => 'success', 
+	        'deleted' => $result > 0
+	    ]);
 	}
 //=====================================================================================================
 }
