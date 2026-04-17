@@ -8,17 +8,8 @@ const schedules = {
 	4: { start: '2024-12-28', pattern: ['Д', 'Д', '', 'Н', 'Н', '', '', ''] }
 };
 
-// Получаем брони из Nextcloud
-//const savedBookings = OC.getInitialState('worker', 'bookings') || [];
+let workerData = { bookings: [], currentUserId: '', isAdmin: false };
 
-// // Читаем данные из скрытого дива
-// const dataEl = document.getElementById('server-data');
-// //const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
-// const currentUserId = dataEl.getAttribute('data-current-user');
-let workerData = { bookings: [] }; 
-
-//console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
-//console.log("Загруженные бронирования:", savedBookings);
 //=============================================================================
 /**
  * Основная функция отрисовки
@@ -197,23 +188,15 @@ function initApp() {
 
     if (stateElement) {
         try {
-            // 1. Читаем значение
             let rawData = stateElement.value;
-            // 2. Если строка начинается не с '{', значит она в base64 — декодируем
-            if (rawData.charAt(0) !== '{') {
-                rawData = atob(rawData);
-            }
-            // 3. Теперь парсим
-            window.workerData = JSON.parse(rawData);
-            console.log("Данные успешно расшифрованы и загружены:", window.workerData);
+            if (rawData.charAt(0) !== '{') rawData = atob(rawData);
+            // ПРИСВАИВАЕМ В window.workerData, чтобы функция render его увидела
+            window.workerData = JSON.parse(rawData); 
         } catch (e) {
             console.error("Ошибка парсинга данных:", e);
-            window.workerData = { bookings: [] };
         }
-    } else {
-        // Если тег не найден, пробуем через OC на всякий случай
-        window.workerData = (typeof OC !== 'undefined' && OC.generateInitialState) ? OC.generateInitialState('worker', 'bookings_data') : { bookings: [] };
     }
+	
     console.log("Данные успешно загружены:", window.workerData);	
 	
     const mInput = document.getElementById('month');
