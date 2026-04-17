@@ -189,12 +189,22 @@ function reserveShift(date, brigade, type, element) {
  * Инициализация
  */
 function initApp() {
-    // 0. Получаем данные от бэкенда (те самые, что передали через InitialState)
-    try {
-       window.workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
-    } catch (e) {
-        console.error("Nextcloud OC object not ready yet", e);
+    // Используем прямой поиск по ID, который генерирует Nextcloud
+    // Формат ID всегда такой: initial-state-[app_id]-[key]
+    const stateElement = document.getElementById('initial-state-worker-bookings_data');
+    
+    if (stateElement) {
+        try {
+            window.workerData = JSON.parse(stateElement.value);
+        } catch (e) {
+            console.error("Ошибка парсинга данных:", e);
+            window.workerData = { bookings: [] };
+        }
+    } else {
+        // Если тег не найден, пробуем через OC на всякий случай
+        window.workerData = (typeof OC !== 'undefined' && OC.generateInitialState) ? OC.generateInitialState('worker', 'bookings_data') : { bookings: [] };
     }
+    console.log("Данные успешно загружены:", window.workerData);	
 	
     const mInput = document.getElementById('month');
     const yInput = document.getElementById('year');
