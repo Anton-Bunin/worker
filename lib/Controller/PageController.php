@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace OCA\WORKER\Controller;
 
 use OCA\WORKER\AppInfo\Application;
+use OCA\WORKER\Db\LimitMapper;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,6 +23,7 @@ class PageController extends Controller
 	private IDBConnection $db;
 	private IUserSession $userSession;
 	private IInitialStateService $initialStateService;
+	private $limitMapper;
 
 	// Конструктор, который "просит" у Nextcloud базу данных и юзера
 	public function __construct(
@@ -29,12 +31,14 @@ class PageController extends Controller
 		IRequest $request, 
 		IDBConnection $db, 
 		IUserSession $userSession,
-		IInitialStateService $initialStateService
+		IInitialStateService $initialStateService,
+		LimitMapper $limitMapper // Добавляем сюда
 	) {
 		parent::__construct($appName, $request);
 		$this->db = $db;
 		$this->userSession = $userSession;
 		$this->initialStateService = $initialStateService;
+		$this->limitMapper = $limitMapper;
 	}
 
 	//=====================================================================================================
@@ -103,7 +107,10 @@ class PageController extends Controller
 		// Получаем текущего пользователя
 		$user = $this->userSession->getUser();
 		$userId = $user ? $user->getUID() : null;
-	 
+
+		 $limits = $this->limitMapper->findAllLimits();
+		 $this->initialStateService->provideInitialState('worker', 'limits_data', $limits);
+		
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('b.*', 'u.displayname')
 		   ->from('worker_bookings', 'b')
