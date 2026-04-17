@@ -9,6 +9,7 @@ use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
+use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IDBConnection;
@@ -126,11 +127,7 @@ class PageController extends Controller
 	          ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
 	
 	    $result = $query->execute();
-	
-	    return new DataResponse([
-	        'status' => 'success', 
-	        'deleted' => $result > 0
-	    ]);
+		return new DataResponse(['status' => 'success']);
 	}
 //=====================================================================================================
 }
