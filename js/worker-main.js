@@ -231,12 +231,11 @@ function initApp() {
 
     // 3. Слушаем клики по таблице (Делегирование)
     document.addEventListener('click', function(e) {
-        const target = e.target.closest('.clickable'); // Используем closest для точности
-	    const currentUserId = window.workerData.currentUserId; // Твой ID из InitialState
-		
+        const target = e.target.closest('.clickable'); // Используем closest для точности	    		
         if (!target) return;
 
         const bookingId = target.dataset.id; 
+		const isAdmin = window.workerData && window.workerData.isAdmin; 
 
         if (bookingId) {
             // // Если ID есть — это УДАЛЕНИЕ
@@ -245,13 +244,13 @@ function initApp() {
             // }
 
 			// ПРОВЕРКА: Удалять может ТОЛЬКО админ
-	        if (currentUserId === 'admin') { 
+	        if (isAdmin === true) { 
 	            if (confirm('Удалить эту запись (права администратора)?')) {
 	                cancelShift(bookingId, target);
 	            }
 	        } else {
 	            // Обычный пользователь кликнул на занятую ячейку
-	            alert('Запись уже создана. Для отмены обратитесь к администратору.');
+	            alert('Для отмены обратитесь к администратору.');
 	        }
 			
         } else {
