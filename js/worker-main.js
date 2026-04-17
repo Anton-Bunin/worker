@@ -45,6 +45,7 @@ function render() {
 		const currentYear = year + Math.floor((month + i - 1) / 12);
 		container.appendChild(createTable(currentMonth, currentYear, daysFilter));
 	}
+	  renderBookingsList();
 }
 //=============================================================================
 function createTable(month, year, daysFilter) {
@@ -283,6 +284,37 @@ function cancelShift(id, element) {
 	        console.log("Запись удалена локально и на сервере");			
 	    }
 	});
+}
+
+//=============================================================================
+function renderBookingsList() {
+    const content = document.getElementById('bookings-list-content');
+    if (!content) return;
+
+    // Берем актуальные данные из памяти
+    const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
+
+    if (bookings.length === 0) {
+        content.innerHTML = '<p style="color: #666;">Список пуст</p>';
+        return;
+    }
+
+    // Сортируем брони по дате (от новых к старым)
+    const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
+
+    let html = '<table class="bookings-table" style="width: 100%; border-collapse: collapse;">';
+    html += '<tr style="border-bottom: 2px solid #ddd; text-align: left;"><th>Дата</th><th>Бригада</th><th>Сотрудник</th></tr>';
+
+    sorted.forEach(b => {
+        html += `<tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 5px;">${b.shift_date}</td>
+                    <td style="padding: 5px;">Бригада №${b.brigade_id}</td>
+                    <td style="padding: 5px;"><strong>${b.displayname}</strong></td>
+                 </tr>`;
+    });
+
+    html += '</table>';
+    content.innerHTML = html;
 }
 //=============================================================================
 // Поехали!
