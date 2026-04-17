@@ -126,7 +126,7 @@ class PageController extends Controller
 	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)))
 	          ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
 	
-	    $result = $query->execute();
+	    $result = $query->executeStatement(); // Вместо execute()
         return new DataResponse([
             'status' => 'success',
             'deleted' => $result > 0
