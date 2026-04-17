@@ -80,7 +80,7 @@ function createTable(month, year, daysFilter) {
 
 		for (let d = 1; d <= daysInMonth; d++) {
 	//		const res = getBrigadeForDay(bId, d, month, year);
-			let res = getBrigadeForDay(bId, d, month, year) || '?'; // Если пусто, пусть будет знак вопроса
+			let res = getBrigadeForDay(bId, d, month, year); 
 			if (res === 'Д') dayCount++;
 			if (res === 'Н') nightCount++;
 
