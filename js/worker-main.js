@@ -16,8 +16,6 @@ const dataEl = document.getElementById('server-data');
 const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
 const currentUserId = dataEl.getAttribute('data-current-user');
 
-const bookingId = target.dataset.id; // Предположим, ты хранишь ID записи в DOM
-
 const workerData = OC.generateInitialState('worker', 'bookings_data');
 console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
 
@@ -100,8 +98,13 @@ function createTable(month, year, daysFilter) {
 				const booking = savedBookings.find(b => b.shift_date === dateStr && b.brigade_id == bId);
 
 				if (booking) {
-					cellClass += ' reserved'; // Добавь этот класс в CSS (например, красный фон)
-					res = 'X'; // Или оставь Д/Н, но с пометкой
+					//*** cellClass += ' reserved'; // Добавь этот класс в CSS (например, красный фон)
+					//*** res = 'X'; // Или оставь Д/Н, но с пометкой
+					
+					// Вставляем имя (displayname) и ID для удаления (data-id)
+					cell.innerHTML = `<span>${d}</span> <small>${booking.displayname}</small>`;
+					cell.setAttribute('data-id', booking.id);
+					cell.classList.add('booked');
 				}
 
 				html += `<td class="${cellClass}" data-date="${dateStr}" data-brigade="${bId}" data-type="${res}">${res}</td>`;
@@ -197,7 +200,7 @@ function initApp() {
         const target = e.target.closest('.clickable'); // Используем closest для точности
         if (!target) return;
 
-        const bookingId = target.getAttribute('data-id'); // Проверяем, есть ли уже бронь
+        const bookingId = target.dataset.id; 
 
         if (bookingId) {
             // Если ID есть — это УДАЛЕНИЕ
