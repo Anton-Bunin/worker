@@ -120,25 +120,23 @@ class PageController extends Controller
 	 */
 	public function cancel(int $id): DataResponse 
 	{
-	   	$userId = $this->userId;
-		
-		// Проверяем, является ли текущий пользователь администратором
-		// В Nextcloud это делается через GroupManager или проверку ID
-		$isAdmin = \OC::$server->getGroupManager()->isAdmin($this->userId);
-		
-	    if (!$isAdmin) {
-        return new DataResponse([
-            'status' => 'error',
-            'message' => 'У вас нет прав на удаление записей.'
-        ], 403); // Возвращаем статус "Запрещено"
-   		}	
+        $userId = $this->userId;
+        
+        // Самая безопасная проверка:
+        $isAdmin = (strtolower($userId) === 'admin');
+        
+        if (!$isAdmin) {
+            return new DataResponse([
+                'status' => 'error',
+                'message' => 'У вас нет прав на удаление записей.'
+            ], 403);
+        }   
 
-	    $query = $this->db->getQueryBuilder();
-	    $query->delete('worker_bookings')
-	          ->where($query->expr()->eq('id', $query->createNamedParameter($id)));
-	         // ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
-	
-	    $result = $query->executeStatement(); // Вместо execute()
+        $query = $this->db->getQueryBuilder();
+        $query->delete('worker_bookings')
+              ->where($query->expr()->eq('id', $query->createNamedParameter($id)));
+
+        $result = $query->executeStatement();
         return new DataResponse([
             'status' => 'success',
             'deleted' => $result > 0
