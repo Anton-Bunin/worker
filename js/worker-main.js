@@ -302,16 +302,19 @@ function renderBookingsList() {
     // Сортируем брони по дате (от новых к старым)
     const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
 
-    let html = '<table class="bookings-table" style="width: 100%; border-collapse: collapse;">';
-    html += '<tr style="border-bottom: 2px solid #ddd; text-align: left;"><th>Дата</th><th>Бригада</th><th>Сотрудник</th></tr>';
-
-    sorted.forEach(b => {
-        html += `<tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 5px;">${b.shift_date}</td>
-                    <td style="padding: 5px;">Бригада №${b.brigade_id}</td>
-                    <td style="padding: 5px;"><strong>${b.displayname}</strong></td>
-                 </tr>`;
-    });
+	let html = '<table class="bookings-table" style="width: auto; min-width: 400px; border-collapse: collapse; font-size: 14px;">';
+	html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
+	        '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
+	        '<th style="padding: 8px 20px;">Бригада</th>' +
+	        '<th style="padding: 8px 0;">Сотрудник</th></tr>';
+	
+	sorted.forEach(b => {
+	    html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+	                <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
+	                <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
+	                <td style="padding: 8px 0;"><strong>${b.displayname}</strong></td>
+	             </tr>`;
+	});
 
     html += '</table>';
     content.innerHTML = html;
