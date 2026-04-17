@@ -104,13 +104,14 @@ class PageController extends Controller
 		   ->from('worker_bookings', 'b')
 		   ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
 		$bookings = $qb->executeQuery()->fetchAll();
+
 		
-		$isAdmin = ($this->userId === 'admin');
-		
+		$isAdmin = (strtolower($this->userId) === 'admin'); 
+
 		$this->initialStateService->provideInitialState('worker', 'bookings_data', [
 			'bookings' => $bookings,
 			'currentUserId' => $this->userId,
-			'isAdmin' => $isAdmin 
+			'isAdmin' => (strtolower($this->userId) === 'admin')
 		]);
 		
 		return new TemplateResponse('worker', 'index');
