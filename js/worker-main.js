@@ -16,7 +16,7 @@ const dataEl = document.getElementById('server-data');
 const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
 const currentUserId = dataEl.getAttribute('data-current-user');
 
-const workerData = OC.generateInitialState('worker', 'bookings_data');
+const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
 console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
 
 console.log("Загруженные бронирования:", savedBookings);
@@ -180,7 +180,7 @@ function reserveShift(date, brigade, type, element) {
  */
 function initApp() {
     // 0. Получаем данные от бэкенда (те самые, что передали через InitialState)
-    const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
+  //  const workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
 
     const mInput = document.getElementById('month');
     const yInput = document.getElementById('year');
