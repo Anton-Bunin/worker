@@ -195,7 +195,8 @@ function initApp() {
             console.error("Ошибка парсинга данных:", e);
         }
     }
-	
+	alert("Сервер говорит, что мой ID: " + window.workerData.currentUserId);
+    alert("Сервер говорит, я админ?: " + window.workerData.isAdmin);
     console.log("Данные успешно загружены:", window.workerData);	
 	
     const mInput = document.getElementById('month');
@@ -219,9 +220,6 @@ function initApp() {
         const bookingId = target.dataset.id; 
 		const isAdmin = window.workerData && window.workerData.isAdmin; 
 
-alert("Сервер говорит, что мой ID: " + window.workerData.currentUserId);
-alert("Сервер говорит, я админ?: " + window.workerData.isAdmin);
-		
         if (bookingId) {
 // ПРОВЕРКА: Удалять может ТОЛЬКО админ
 	        if (String(window.workerData.isAdmin) === true) { 
