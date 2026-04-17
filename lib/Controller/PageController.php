@@ -105,18 +105,13 @@ class PageController extends Controller
 		   ->leftJoin('b', 'users', 'u', 'b.user_id = u.uid');
 		$bookings = $qb->executeQuery()->fetchAll();
 		
-		$this->initialStateService->provideInitialState('worker', 'bookings_data', [
-		    'bookings' => $bookings,
-		    'currentUserId' => $this->userId
-		]);
-
-		   $isAdmin = \OC::$server->getGroupManager()->isAdmin($this->userId);
+		$isAdmin = ($this->userId === 'admin');
 		
-		    $this->initialStateService->provideInitialState('worker', 'bookings_data', [
-		        'bookings' => $bookings,
-		        'currentUserId' => $this->userId,
-		        'isAdmin' => $isAdmin // Передаем результат проверки (true/false)
-		    ]);
+		$this->initialStateService->provideInitialState('worker', 'bookings_data', [
+			'bookings' => $bookings,
+			'currentUserId' => $this->userId,
+			'isAdmin' => $isAdmin 
+		]);
 		
 		return new TemplateResponse('worker', 'index');
 	}
