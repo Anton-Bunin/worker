@@ -218,11 +218,11 @@ function initApp() {
         if (!target) return;
 
         const bookingId = target.dataset.id; 
-		const isAdmin = window.workerData && window.workerData.isAdmin; 
+		const isAdmin = window.workerData.isAdmin; 
 
         if (bookingId) {
 // ПРОВЕРКА: Удалять может ТОЛЬКО админ
-	        if (String(window.workerData.isAdmin) === true) { 
+	        if (isAdmin === true || isAdmin === 'true')  { 
 	            if (confirm('Удалить эту запись (права администратора)?')) {
 	                cancelShift(bookingId, target);
 	            }
