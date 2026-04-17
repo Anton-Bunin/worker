@@ -13,12 +13,12 @@ const schedules = {
 
 // Читаем данные из скрытого дива
 const dataEl = document.getElementById('server-data');
-const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
+//const savedBookings = dataEl ? JSON.parse(dataEl.getAttribute('data-bookings')) : [];
 const currentUserId = dataEl.getAttribute('data-current-user');
 let workerData = { bookings: [] }; 
 
-console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
-console.log("Загруженные бронирования:", savedBookings);
+//console.log(workerData.bookings); // Проверь в консоли, данные теперь тут!
+//console.log("Загруженные бронирования:", savedBookings);
 //=============================================================================
 /**
  * Основная функция отрисовки
@@ -28,6 +28,7 @@ function render() {
 	const yearInput = document.getElementById('year');
 	const monthsCountInput = document.getElementById('monthsCount');
 	const daysFilterInput = document.getElementById('daysFilter');
+	const savedBookings = workerData.bookings || [];
 
 	if (!monthInput || !yearInput) return;
 
@@ -50,6 +51,9 @@ function createTable(month, year, daysFilter) {
 	const table = document.createElement('table');
 	const daysInMonth = new Date(year, month, 0).getDate();
 	const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+
+	 // Если workerData не загрузился, используем пустой массив, чтобы не падать
+    const savedBookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
 
 	let filteredDays = [];
 	if (daysFilter.trim() !== "") {
@@ -95,18 +99,25 @@ function createTable(month, year, daysFilter) {
 
 				// Ищем, есть ли бронь на эту дату и бригаду
 				const booking = savedBookings.find(b => b.shift_date === dateStr && b.brigade_id == bId);
-
+				
+				let cellContent = res; // Буква Д или Н
+				let extraClass = '';
+				let dataIdAttr = '';
+				
 				if (booking) {
-					//*** cellClass += ' reserved'; // Добавь этот класс в CSS (например, красный фон)
-					//*** res = 'X'; // Или оставь Д/Н, но с пометкой
-					
-					// Вставляем имя (displayname) и ID для удаления (data-id)
-					cell.innerHTML = `<span>${d}</span> <small>${booking.displayname}</small>`;
-					cell.setAttribute('data-id', booking.id);
-					cell.classList.add('booked');
+				    extraClass = ' booked'; // Подсвечиваем забронированное
+				    dataIdAttr = `data-id="${booking.id}"`; // ID для удаления
+				    cellContent = booking.displayname; // ИМЯ (Задача №2)
 				}
-
-				html += `<td class="${cellClass}" data-date="${dateStr}" data-brigade="${bId}" data-type="${res}">${res}</td>`;
+				
+				// Генерируем строку ячейки ОДНИМ куском
+				html += `<td class="${cellClass}${extraClass}" 
+				             ${dataIdAttr} 
+				             data-date="${dateStr}" 
+				             data-brigade="${bId}" 
+				             data-type="${res}">
+				             ${cellContent}
+				         </td>`;
 			}
 		}
 		html += `<td class="total">У:${dayCount} Н:${nightCount}</td></tr>`;
@@ -180,7 +191,7 @@ function reserveShift(date, brigade, type, element) {
 function initApp() {
     // 0. Получаем данные от бэкенда (те самые, что передали через InitialState)
     try {
-        workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
+       window.workerData = OC.generateInitialState('worker', 'bookings_data') || { bookings: [] };
     } catch (e) {
         console.error("Nextcloud OC object not ready yet", e);
     }
@@ -240,10 +251,13 @@ function cancelShift(id, element) {
 }
 //=============================================================================
 // Поехали!
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', initApp);
-} else {
-	initApp();
-}
-
+$(document).ready(function() {
+    // Ждем, пока Nextcloud проинициализирует свои объекты
+    OC.Plugins.register('core', {
+        init: function() {
+            initApp();
+        }
+    });
+ initApp(); 
+	
 window.render = render;
