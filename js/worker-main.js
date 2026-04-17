@@ -255,15 +255,19 @@ function cancelShift(id, element) {
     fetch(OC.generateUrl('/apps/worker/cancel/' + id), {
         method: 'POST',
         headers: {
-            'requesttoken': OC.requestToken
+            'requesttoken': OC.requestToken,
+			'X-Requested-With': 'XMLHttpRequest' 
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error('Server error');
+        return response.json();
+    })
     .then(data => {
         if (data.status === 'success') {
             element.classList.remove('booked');
             element.removeAttribute('data-id');
-            element.innerHTML = element.getAttribute('data-day'); // Возвращаем только число
+            element.innerHTML = element.getAttribute('data-day') || element.getAttribute('data-type');
         }
     });
 }
