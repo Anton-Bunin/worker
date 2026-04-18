@@ -234,8 +234,8 @@ function initApp() {
 		        cancelShift(id, deleteBtn);
 		        return; // Выходим, чтобы не сработали другие обработчики
 		    }	
-		
-		const target = e.target.closest('.clickable'); 
+
+		const target = e.target.closest('.clickable') || e.target.closest('.no-limit'); 
         if (!target) return;
 
         const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
