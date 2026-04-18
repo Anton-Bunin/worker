@@ -45,53 +45,69 @@ class PageController extends Controller
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function reserve(string $date, int $brigade, string $type): JSONResponse {
-		try {
-			$user = $this->userSession->getUser();
-			if ($user === null) {
-				return new JSONResponse(['status' => 'error', 'message' => 'User not logged in'], 403);
-			}
-			$userId = $user->getUID();
-
-			// --- НАСТРОЙКА ЛИМИТА ---
-			$maxShifts = 5; // Поменяй на нужное тебе число
-			// ------------------------
-
-			// Считаем, сколько смен уже занял этот юзер в месяце выбранной даты
-			$month = date('m', strtotime($date));
-			$year = date('Y', strtotime($date));
-			$monthPattern = $year . '-' . $month . '-%';
-
-			$qb = $this->db->getQueryBuilder();
-			$qb->select($qb->func()->count('*', 'cnt'))
-				->from('worker_bookings')
-				->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
-				->andWhere($qb->expr()->like('shift_date', $qb->createNamedParameter($monthPattern)));
-			
-			$count = $qb->executeQuery()->fetchOne();
-
-			if ($count >= $maxShifts) {
-				return new JSONResponse([
-					'status' => 'error', 
-					'message' => 'Превышен лимит! Можно занять не более ' . $maxShifts . ' смен в месяц.'
-				], 403);
-			}
-
-			// Если лимит не превышен, записываем
-			$qb = $this->db->getQueryBuilder();
-			$qb->insert('worker_bookings')
-				->values([
-					'user_id' => $qb->createNamedParameter($userId),
-					'shift_date' => $qb->createNamedParameter($date),
-					'brigade_id' => $qb->createNamedParameter($brigade),
-					'shift_type' => $qb->createNamedParameter($type),
-				]);
-			
-			$qb->executeStatement();
-
-			return new JSONResponse(['status' => 'success']);
-		} catch (\Exception $e) {
-			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
-		}
+	    try {
+	        $user = $this->userSession->getUser();
+	        if ($user === null) {
+	            return new JSONResponse(['status' => 'error', 'message' => 'User not logged in'], 403);
+	        }
+	        $userId = $user->getUID();
+	
+	        // 1. ПРОВЕРКА: Есть ли вообще вакансия от админа?
+	        $qb = $this->db->getQueryBuilder();
+	        $qb->select('max_slots')
+	            ->from('worker_limits')
+	            ->where($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
+	            ->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
+	        
+	        $limitData = $qb->executeQuery()->fetchAssociative();
+	
+	        if (!$limitData) {
+	            return new JSONResponse(['status' => 'error', 'message' => 'Запись на эту дату закрыта.'], 403);
+	        }
+	
+	        $maxSlots = (int)$limitData['max_slots'];
+	
+	        // 2. ПРОВЕРКА: Сколько человек УЖЕ записано в эту ячейку?
+	        $qb = $this->db->getQueryBuilder();
+	        $qb->select($qb->func()->count('*', 'cnt'))
+	            ->from('worker_bookings')
+	            ->where($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
+	            ->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
+	        
+	        $currentBookingsCount = (int)$qb->executeQuery()->fetchOne();
+	
+	        if ($currentBookingsCount >= $maxSlots) {
+	            return new JSONResponse(['status' => 'error', 'message' => 'Места закончились!'], 403);
+	        }
+	
+	        // 3. ПРОВЕРКА: А не записан ли ЭТОТ юзер уже сюда? (чтобы не дублировать)
+	        $qb = $this->db->getQueryBuilder();
+	        $qb->select('id')
+	            ->from('worker_bookings')
+	            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+	            ->andWhere($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)));
+	        
+	        if ($qb->executeQuery()->fetchOne()) {
+	            return new JSONResponse(['status' => 'error', 'message' => 'Вы уже записаны на эту дату.'], 403);
+	        }
+	
+	        // 4. ВСЁ ОК — ЗАПИСЫВАЕМ
+	        $qb = $this->db->getQueryBuilder();
+	        $qb->insert('worker_bookings')
+	            ->values([
+	                'user_id' => $qb->createNamedParameter($userId),
+	                'shift_date' => $qb->createNamedParameter($date),
+	                'brigade_id' => $qb->createNamedParameter($brigade),
+	                'shift_type' => $qb->createNamedParameter($type),
+	            ]);
+	        
+	        $qb->executeStatement();
+	
+	        return new JSONResponse(['status' => 'success']);
+	
+	    } catch (\Exception $e) {
+	        return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
+	    }
 	}
 	//=====================================================================================================
 	
