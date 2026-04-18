@@ -224,25 +224,11 @@ function initApp() {
     ['month', 'year', 'monthsCount', 'daysFilter'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', render);
-    });
-    
-		const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
-		
-		// Если админ кликнул по "выключенной" ячейке
-		if (isAdmin && target && target.classList.contains('no-limit')) {
-		    const date = target.getAttribute('data-date');
-		    const brigade = target.getAttribute('data-brigade');
-		    
-		    const slots = prompt(`Активировать дату ${date}?\nВведите кол-во вакансий:`, "5");
-		    if (slots !== null) {
-		        saveLimitOnServer(date, brigade, parseInt(slots));
-		    }
-		    return; // Прерываем, чтобы не сработала логика обычной записи
-		}    
+    });    
 		
 	document.addEventListener('click', function(e) {
 	    // Проверка клика по кнопке "Удалить" в таблице
-		    const deleteBtn = e.target.closest('.admin-delete-btn');
+		 const deleteBtn = e.target.closest('.admin-delete-btn');
 		    if (deleteBtn) {
 		        const id = deleteBtn.dataset.id;
 		        cancelShift(id, deleteBtn);
@@ -256,6 +242,18 @@ function initApp() {
         const date = target.getAttribute('data-date');
         const brigade = target.getAttribute('data-brigade');
 
+		// Если админ кликнул по "выключенной" ячейке
+		if (isAdmin && target && target.classList.contains('no-limit')) {
+		    const date = target.getAttribute('data-date');
+		    const brigade = target.getAttribute('data-brigade');
+		    
+		    const slots = prompt(`Активировать дату ${date}?\nВведите кол-во вакансий:`, "5");
+		    if (slots !== null) {
+		        saveLimitOnServer(date, brigade, parseInt(slots));
+		    }
+		    return; // Прерываем, чтобы не сработала логика обычной записи
+		}    
+		
         // Ищем всех записанных в эту ячейку в глобальном массиве
         const cellBookings = window.workerData.bookings.filter(b => 
             b.shift_date === date && String(b.brigade_id) === String(brigade)
