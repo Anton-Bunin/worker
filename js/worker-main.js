@@ -47,7 +47,7 @@ function createTable(month, year, daysFilter) {
 	 // Если workerData не загрузился, используем пустой массив, чтобы не падать
     const savedBookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
 
-	console.log('Проверка лимитов:', OCP.InitialState.loadState('worker', 'limits_data'));
+//	console.log('Проверка лимитов:', OCP.InitialState.loadState('worker', 'limits_data'));
 
 	let filteredDays = [];
 	if (daysFilter.trim() !== "") {
@@ -72,50 +72,6 @@ function createTable(month, year, daysFilter) {
 		let dayCount = 0;
 		let nightCount = 0;
 
-	// 	for (let d = 1; d <= daysInMonth; d++) {
-	// //		const res = getBrigadeForDay(bId, d, month, year);
-	// 		let res = getBrigadeForDay(bId, d, month, year); 
-	// 		if (res === 'Д') dayCount++;
-	// 		if (res === 'Н') nightCount++;
-
-	// 		if (filteredDays.length === 0 || filteredDays.includes(d)) {
-	// 			let cellClass = '';
-	// 			if (res === 'Д') cellClass = 'day';
-	// 			if (res === 'Н') cellClass = 'night';
-				
-	// 			if (res === 'Д' || res === 'Н') {
-	// 				cellClass += ' clickable';
-	// 			}
-
-	// 			const dStr = String(d).padStart(2, '0');
-	// 			const mStr = String(month).padStart(2, '0');
-	// 			const dateStr = `${year}-${mStr}-${dStr}`;
-
-	// 			// Ищем, есть ли бронь на эту дату и бригаду
-	// 			const booking = savedBookings.find(b => b.shift_date === dateStr && b.brigade_id == bId);
-				
-	// 			let cellContent = res; // Буква Д или Н
-	// 			let extraClass = '';
-	// 			let dataIdAttr = '';
-				
-	// 			if (booking) {
-	// 			    extraClass = ' booked'; // Подсвечиваем забронированное
-	// 			    dataIdAttr = `data-id="${booking.id}"`; // ID для удаления
-	// 			    // cellContent = booking.displayname; // ИМЯ (Задача №2)
-	// 				cellContent = 'X';
-	// 			}
-				
-	// 			// Генерируем строку ячейки ОДНИМ куском
-	// 			html += `<td class="${cellClass}${extraClass}" 
-	// 			             ${dataIdAttr} 
-	// 			             data-day="${d}" 
-	// 			             data-date="${dateStr}" 
-	// 			             data-brigade="${bId}" 
-	// 			             data-type="${res}">
-	// 			             ${cellContent}
-	// 			         </td>`;
-	// 		}
-	// 	}
 		for (let d = 1; d <= daysInMonth; d++) {
 		    let res = getBrigadeForDay(bId, d, month, year); 
 		    if (res === 'Д') dayCount++;
