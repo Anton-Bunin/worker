@@ -211,8 +211,34 @@ class PageController extends Controller
 	               'max_slots' => $qb->createNamedParameter($slots),
 	           ]);
 	        $qb->executeStatement();
-	    }
-	
+	    }	
 	    return new JSONResponse(['status' => 'success']);
 	}	
+//=====================================================================================================
+	 /**
+     * Подтверждение бронирования администратором
+     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    public function confirm(int $id): JSONResponse {
+        try {
+            // 1. Проверяем, что это админ
+            $user = $this->userSession->getUser();
+            if ($user === null || strtolower($user->getUID()) !== 'admin') {
+                return new JSONResponse(['status' => 'error', 'message' => 'Forbidden'], 403);
+            }
+
+            // 2. Обновляем статус в базе
+            $qb = $this->db->getQueryBuilder();
+            $qb->update('worker_bookings')
+               ->set('status', $qb->createNamedParameter('confirmed'))
+               ->where($qb->expr()->eq('id', $qb->createNamedParameter($id)));
+            
+            $qb->executeStatement();
+
+            return new JSONResponse(['status' => 'success']);
+        } catch (\Exception $e) {
+            return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
 }
