@@ -99,6 +99,7 @@ class PageController extends Controller
 	                'shift_date' => $qb->createNamedParameter($date),
 	                'brigade_id' => $qb->createNamedParameter($brigade),
 	                'shift_type' => $qb->createNamedParameter($type),
+					'status' => $qb->createNamedParameter('pending'), 
 	            ]);
 	        
 	        $qb->executeStatement();
