@@ -244,6 +244,14 @@ function initApp() {
 		        return; // Выходим, чтобы не сработали другие обработчики
 		    }	
 
+        // --- НОВЫЙ БЛОК: Проверка клика по кнопке "Одобрить" ---
+        const confirmBtn = e.target.closest('.admin-confirm-btn');
+        if (confirmBtn) {
+            const id = confirmBtn.dataset.id;
+            confirmShiftOnServer(id); // Вызываем функцию подтверждения
+            return; 
+        }
+		
 		const target = e.target.closest('.clickable') || e.target.closest('.no-limit'); 
         if (!target) return;
 
@@ -440,6 +448,32 @@ function cancelShift(id, element) {
 	    });
 	}
 //=============================================================================
+	function confirmShiftOnServer(id) {
+	    fetch(OC.generateUrl('/apps/worker/confirm/' + id), {
+	        method: 'POST',
+	        headers: {
+	            'requesttoken': OC.requestToken,
+	            'X-Requested-With': 'XMLHttpRequest'
+	        }
+	    })
+	    .then(response => {
+	        if (!response.ok) throw new Error('Ошибка сервера');
+	        return response.json();
+	    })
+	    .then(data => {
+	        if (data.status === 'success') {
+	            // Обновляем статус локально в памяти, чтобы не перегружать страницу
+	            const booking = window.workerData.bookings.find(b => b.id == id);
+	            if (booking) booking.status = 'confirmed';
+	            
+	            render(); // Перерисовываем всё
+	            console.log("Запись подтверждена");
+	        }
+	    })
+	    .catch(err => alert('Ошибка при подтверждении: ' + err));
+	}
+//=============================================================================
+
 // Поехали!
 $(document).ready(function() {
     // Ждем, пока Nextcloud проинициализирует свои объекты
