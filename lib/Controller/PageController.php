@@ -158,4 +158,28 @@ class PageController extends Controller
 		]);
 	}
 	//=====================================================================================================
+	
+	#[NoAdminRequired] 
+	#[NoCSRFRequired]
+	public function saveLimit(string $date, int $brigade, int $slots): JSONResponse {
+	    // Проверка на админа
+	    $userId = $this->userSession->getUser()->getUID();
+	    if (strtolower($userId) !== 'admin') {
+	        return new JSONResponse(['status' => 'error', 'message' => 'Forbidden'], 403);
+	    }
+	
+	    $qb = $this->db->getQueryBuilder();
+	    
+	    if ($slots <= 0) {
+	        // Удаляем вакансию (ячейка станет тусклой)
+	        $qb->delete('worker_limits')
+	           ->where($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
+	           ->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
+	    } else {
+	        // Создаем или обновляем лимит
+	        $sql = "REPLACE INTO oc_worker_limits (shift_date, brigade_id, max_slots) VALUES (?, ?, ?)";
+	        $this->db->prepare($sql)->executeStatement([$date, $brigade, $slots]);
+	    }
+	   return new JSONResponse(['status' => 'success']);
+	}	
 }
