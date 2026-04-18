@@ -161,25 +161,41 @@ class PageController extends Controller
 	
 	#[NoAdminRequired] 
 	#[NoCSRFRequired]
-	public function saveLimit(string $date, int $brigade, int $slots): JSONResponse {
+	public function saveLimit(): JSONResponse { // Убрали аргументы из скобок
 	    // Проверка на админа
-	    $userId = $this->userSession->getUser()->getUID();
-	    if (strtolower($userId) !== 'admin') {
+	    $user = $this->userSession->getUser();
+	    if (!$user || strtolower($user->getUID()) !== 'admin') {
 	        return new JSONResponse(['status' => 'error', 'message' => 'Forbidden'], 403);
+	    }
+	
+	    // Получаем данные из запроса вручную
+	    $date = $this->request->getParam('date');
+	    $brigade = (int)$this->request->getParam('brigade');
+	    $slots = (int)$this->request->getParam('slots');
+	
+	    if (!$date || !$brigade) {
+	        return new JSONResponse(['status' => 'error', 'message' => 'Missing params'], 400);
 	    }
 	
 	    $qb = $this->db->getQueryBuilder();
 	    
-	    if ($slots <= 0) {
-	        // Удаляем вакансию (ячейка станет тусклой)
-	        $qb->delete('worker_limits')
-	           ->where($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
-	           ->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
-	    } else {
-	        // Создаем или обновляем лимит
-	        $sql = "REPLACE INTO oc_worker_limits (shift_date, brigade_id, max_slots) VALUES (?, ?, ?)";
-	        $this->db->prepare($sql)->executeStatement([$date, $brigade, $slots]);
+	    // 1. Сначала удаляем старый лимит (чтобы не было конфликта UNIQUE)
+	    $qb->delete('worker_limits')
+	       ->where($qb->expr()->eq('shift_date', $qb->createNamedParameter($date)))
+	       ->andWhere($qb->expr()->eq('brigade_id', $qb->createNamedParameter($brigade)));
+	    $qb->executeStatement();
+	
+	    // 2. Если слоты > 0, вставляем новую запись
+	    if ($slots > 0) {
+	        $qb->insert('worker_limits')
+	           ->values([
+	               'shift_date' => $qb->createNamedParameter($date),
+	               'brigade_id' => $qb->createNamedParameter($brigade),
+	               'max_slots' => $qb->createNamedParameter($slots),
+	           ]);
+	        $qb->executeStatement();
 	    }
-	   return new JSONResponse(['status' => 'success']);
+	
+	    return new JSONResponse(['status' => 'success']);
 	}	
 }
