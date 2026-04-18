@@ -141,25 +141,27 @@ function createTable(month, year, daysFilter) {
 		
 		        // 2. ЛОГИКА ОТОБРАЖЕНИЯ
 		        if (limit) {
-		            // Если лимит есть, ячейка активна
-		            cellClass = (res === 'Д') ? 'day clickable' : 'night clickable';
-		            
-		            const count = cellBookings.length;
-		            const max = limit.maxSlots;
-		
-		            if (myBooking) {
-		                // Если я уже записан
-		                cellClass += ' booked';
-		                dataIdAttr = `data-id="${myBooking.id}"`;
-		                cellContent = `<div class="slot-info"><b>X</b> <small>(${count}/${max})</small></div>`;
-		            } else if (count < max) {
-		                // Места есть, но я не записан
-		                cellContent = `<div class="slot-info">${res} <small>(${count}/${max})</small></div>`;
-		            } else {
-		                // Мест нет
-		                cellClass += ' full-cell';
-		                cellContent = `<div class="slot-info"><small>FULL</small> <small>(${count}/${max})</small></div>`;
-		            }
+					    const count = cellBookings.length;
+					    const max = limit.maxSlots;
+					    const myBooking = cellBookings.find(b => b.user_id === window.workerData.currentUserId);
+					
+					    // Если админ - добавляем ему в ячейку спец. атрибут со всеми ID записей
+					    if (window.workerData.isAdmin) {
+					        const ids = cellBookings.map(b => b.id).join(',');
+					        dataIdAttr = `data-ids="${ids}"`; // Сохраняем все ID через запятую
+					    } else if (myBooking) {
+					        dataIdAttr = `data-id="${myBooking.id}"`; // Обычный юзер видит только свой ID
+					    }
+					
+					    // Содержимое ячейки
+					    let icon = res; // По умолчанию Д или Н
+					    if (myBooking) icon = '<b>X</b>';
+					    if (count >= max && !myBooking) icon = '<small>FULL</small>';
+					
+					    cellContent = `<div class="slot-info">${icon} <small>(${count}/${max})</small></div>`;
+					    
+					    // Добавляем класс, если ячейка не пустая (для админа)
+					    if (count > 0) cellClass += ' has-records';
 		        } else {
 		            // Лимита нет - ячейка "выключена"
 		            cellClass = 'no-limit';
@@ -246,9 +248,7 @@ function reserveShift(date, brigade, type, element) {
  * Инициализация
  */
 function initApp() {
-    // Используем прямой поиск по ID, который генерирует Nextcloud
-    // Формат ID всегда такой: initial-state-[app_id]-[key]
-    const stateElement = document.getElementById('initial-state-worker-bookings_data');
+  const stateElement = document.getElementById('initial-state-worker-bookings_data');
 
     if (stateElement) {
         try {
@@ -259,9 +259,6 @@ function initApp() {
             console.error("Ошибка парсинга данных:", e);
         }
     }
-	console.log("Сервер говорит, что мой ID: " + window.workerData.currentUserId);
-    console.log("Сервер говорит, я админ?: " + window.workerData.isAdmin);
-    console.log("Данные успешно загружены:", window.workerData);	
 	
     const mInput = document.getElementById('month');
     const yInput = document.getElementById('year');
@@ -276,35 +273,47 @@ function initApp() {
         if (el) el.addEventListener('input', render);
     });
 
-    // 3. Слушаем клики по таблице (Делегирование)
     document.addEventListener('click', function(e) {
-        const target = e.target.closest('.clickable'); // Используем closest для точности	    		
+        const target = e.target.closest('.clickable'); 
         if (!target) return;
 
-        const bookingId = target.dataset.id; 
-		const isAdmin = window.workerData.isAdmin; 
+        const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
+        const date = target.getAttribute('data-date');
+        const brigade = target.getAttribute('data-brigade');
 
-        if (bookingId) {
-// ПРОВЕРКА: Удалять может ТОЛЬКО админ
-	        if (isAdmin === true || isAdmin === 'true')  { 
-	            if (confirm('Удалить эту запись (права администратора)?')) {
-	                cancelShift(bookingId, target);
-	            }
-	        } else {
-	            // Обычный пользователь кликнул на занятую ячейку
-	            alert('Для отмены обратитесь к администратору.');
-	        }
-			
+        // Ищем всех записанных в эту ячейку в глобальном массиве
+        const cellBookings = window.workerData.bookings.filter(b => 
+            b.shift_date === date && String(b.brigade_id) === String(brigade)
+        );
+
+        // ЛОГИКА УДАЛЕНИЯ (Для админа)
+        if (isAdmin && cellBookings.length > 0) {
+            let msg = `Записи на ${date}:\n`;
+            cellBookings.forEach((b, i) => {
+                msg += `${i + 1}. ${b.displayname || b.user_id}\n`;
+            });
+
+            if (confirm(msg + '\nУдалить последнюю запись из списка?')) {
+                const idToDelete = cellBookings[cellBookings.length - 1].id;
+                cancelShift(idToDelete, target);
+            }
+            return; 
+        }
+
+        // ЛОГИКА ЗАПИСИ (Если записей нет или лимит позволяет)
+        const myBookingId = target.dataset.id; 
+        if (myBookingId) {
+            alert('Вы уже записаны. Для отмены обратитесь к администратору.');
+        } else if (target.classList.contains('full-cell')) {
+            alert('Мест больше нет!');
         } else {
-            // Если ID нет — это ЗАПИСЬ (твой старый метод)
-            const date = target.getAttribute('data-date');
-            const brigade = target.getAttribute('data-brigade');
             const type = target.getAttribute('data-type');
             reserveShift(date, brigade, type, target);
         }
     });
 
-    render();
+    // Вот он, на своем месте!
+    render();  
 }
 //==========================================================================================
 function cancelShift(id, element) {
