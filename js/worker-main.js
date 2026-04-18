@@ -202,8 +202,20 @@ function reserveShift(date, brigade, type, element) {
  * Инициализация
  */
 function initApp() {
-  const stateElement = document.getElementById('initial-state-worker-bookings_data');
-
+		const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
+		
+		// Если админ кликнул по "выключенной" ячейке
+		if (isAdmin && target && target.classList.contains('no-limit')) {
+		    const date = target.getAttribute('data-date');
+		    const brigade = target.getAttribute('data-brigade');
+		    
+		    const slots = prompt(`Активировать дату ${date}?\nВведите кол-во вакансий:`, "5");
+		    if (slots !== null) {
+		        saveLimitOnServer(date, brigade, parseInt(slots));
+		    }
+		    return; // Прерываем, чтобы не сработала логика обычной записи
+		}    	
+	const stateElement = document.getElementById('initial-state-worker-bookings_data');
     if (stateElement) {
         try {
             let rawData = stateElement.value;
@@ -348,6 +360,26 @@ function renderBookingsList() {
 
     html += '</table>';
     content.innerHTML = html;	
+}
+//=============================================================================
+function saveLimitOnServer(date, brigade, slots) {
+    fetch(OC.generateUrl('/apps/worker/saveLimit'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'requesttoken': OC.requestToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ date, brigade, slots })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload(); // Перезагружаем для обновления сетки
+        } else {
+            alert('Ошибка при сохранении лимита');
+        }
+    });
 }
 //=============================================================================
 // Поехали!
