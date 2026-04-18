@@ -345,52 +345,69 @@ function cancelShift(id, element) {
 }
 
 //=============================================================================
-function renderBookingsList() {
- const content = document.getElementById('bookings-list-content');
-    if (!content) return;
-
-    const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
-    const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
-
-    if (bookings.length === 0) {
-        content.innerHTML = '<p style="color: #666;">Список пуст</p>';
-        return;
-    }
-
-    const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
-
-    let html = '<table class="bookings-table" style="width: auto; min-width: 500px; border-collapse: collapse; font-size: 14px;">';
-    html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
-            '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
-            '<th style="padding: 8px 20px;">Бригада</th>' +
-            '<th style="padding: 8px 20px;">Сотрудник</th>';
-    
-    if (isAdmin) {
-        html += '<th style="padding: 8px 0;">Действие</th>';
-    }
-    html += '</tr>';
-    
-    sorted.forEach(b => {
-        html += `<tr style="border-bottom: 1px solid #f0f0f0;">
-                    <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
-                    <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
-                    <td style="padding: 8px 20px;"><strong>${b.displayname || b.user_id}</strong></td>`;
-        
-        if (isAdmin) {
-  			 html += `<td style="padding: 8px 0;">
-                <button class="admin-delete-btn" 
-                        data-id="${b.id}"
-                        style="background: none; border: none; color: #d11d1d; cursor: pointer; text-decoration: underline; padding: 0; font-size: 13px;">
-                    Удалить
-                </button>
-             </td>`;
-        }
-        html += '</tr>';
-    });
-
-    html += '</table>';
-    content.innerHTML = html;	
-}
+	function renderBookingsList() {
+	    const content = document.getElementById('bookings-list-content');
+	    if (!content) return;
+	
+	    const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
+	    const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
+	
+	    if (bookings.length === 0) {
+	        content.innerHTML = '<p style="color: #666;">Список пуст</p>';
+	        return;
+	    }
+	
+	    const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
+	
+	    let html = '<table class="bookings-table" style="width: auto; min-width: 500px; border-collapse: collapse; font-size: 14px;">';
+	    html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
+	            '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
+	            '<th style="padding: 8px 20px;">Бригада</th>' +
+	            '<th style="padding: 8px 20px;">Сотрудник</th>';
+	    
+	    if (isAdmin) {
+	        html += '<th style="padding: 8px 0;">Действие</th>';
+	    }
+	    html += '</tr>';
+	    
+	    sorted.forEach(b => {
+	        // Если запись не подтверждена, сделаем текст сотрудника чуть бледнее
+	        const isPending = b.status === 'pending';
+	        const rowStyle = isPending ? 'color: #999;' : '';
+	
+	        html += `<tr style="border-bottom: 1px solid #f0f0f0; ${rowStyle}">
+	                    <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
+	                    <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
+	                    <td style="padding: 8px 20px;">
+	                        <strong>${b.displayname || b.user_id}</strong>
+	                        ${isPending ? ' <small>(ожидает)</small>' : ''}
+	                    </td>`;
+	        
+	        if (isAdmin) {
+	            html += `<td style="padding: 8px 0;">`;
+	            
+	            // Если статус pending — показываем кнопку Одобрить
+	            if (isPending) {
+	                html += `<button class="admin-confirm-btn" 
+	                                data-id="${b.id}"
+	                                style="background: #28a745; border: none; color: white; cursor: pointer; border-radius: 3px; padding: 2px 8px; margin-right: 10px; font-size: 12px;">
+	                            Одобрить
+	                        </button>`;
+	            }
+	
+	            html += `<button class="admin-delete-btn" 
+	                        data-id="${b.id}"
+	                        style="background: none; border: none; color: #d11d1d; cursor: pointer; text-decoration: underline; padding: 0; font-size: 13px;">
+	                    Удалить
+	                </button>
+	             </td>`;
+	        }
+	        html += '</tr>';
+	    });
+	
+	    html += '</table>';
+	    content.innerHTML = html;	
+	}
 //=============================================================================
 	function saveLimitOnServer(date, brigade, slots) {
 	    const formData = new FormData();
