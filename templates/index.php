@@ -29,6 +29,13 @@ Util::addStyle('worker', 'worker-main');
 		<thead><tr id="header-days"></tr></thead>
 		<tbody id="tabel-body"></tbody>
 	</table>
+
+	<div class="bookings-filter-controls" style="margin-bottom: 10px; padding: 10px; background: #f0f4f7; border-radius: 5px; display: flex; gap: 10px; align-items: center;">
+	    <span style="font-weight: bold; font-size: 13px;">Фильтр списка:</span>
+	    <select id="list-filter-month" style="font-size: 12px; padding: 2px;"></select>
+	    <input type="number" id="list-filter-year" style="width: 60px; font-size: 12px; padding: 2px;">
+	    <button id="reset-list-filter" style="font-size: 11px; cursor: pointer;">Сбросить (как в графике)</button>
+	</div>
 	
    <!-- Место для списка бронирований -->
 	<div id="bookings-list-container" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; max-width: 600px;">
