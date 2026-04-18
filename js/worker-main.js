@@ -361,25 +361,36 @@ function renderBookingsList() {
     content.innerHTML = html;	
 }
 //=============================================================================
-function saveLimitOnServer(date, brigade, slots) {
-    fetch(OC.generateUrl('/apps/worker/saveLimit'), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'requesttoken': OC.requestToken,
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ date, brigade, slots })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            location.reload(); // Перезагружаем для обновления сетки
-        } else {
-            alert('Ошибка при сохранении лимита');
-        }
-    });
-}
+	function saveLimitOnServer(date, brigade, slots) {
+	    const formData = new FormData();
+	    formData.append('date', date);
+	    formData.append('brigade', brigade);
+	    formData.append('slots', slots);
+	
+	    fetch(OC.generateUrl('/apps/worker/saveLimit'), {
+	        method: 'POST',
+	        headers: {
+	            'requesttoken': OC.requestToken,
+	            'X-Requested-With': 'XMLHttpRequest'
+	        },
+	        body: formData
+	    })
+	    .then(response => {
+	        if (!response.ok) throw new Error('Ошибка ' + response.status);
+	        return response.json();
+	    })
+	    .then(data => {
+	        if (data.status === 'success') {
+	            location.reload(); 
+	        } else {
+	            alert('Ошибка: ' + (data.message || 'неизвестно'));
+	        }
+	    })
+	    .catch(err => {
+	        console.error('Ошибка сохранения:', err);
+	        alert('Не удалось сохранить лимит. Проверьте логи.');
+	    });
+	}
 //=============================================================================
 // Поехали!
 $(document).ready(function() {
