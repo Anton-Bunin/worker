@@ -46,8 +46,7 @@ function createTable(month, year, daysFilter) {
 
 	 // Если workerData не загрузился, используем пустой массив, чтобы не падать
     const savedBookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
-
-//	console.log('Проверка лимитов:', OCP.InitialState.loadState('worker', 'limits_data'));
+	const limitsData = OCP.InitialState.loadState('worker', 'limits_data') || [];
 
 	let filteredDays = [];
 	if (daysFilter.trim() !== "") {
@@ -82,8 +81,7 @@ function createTable(month, year, daysFilter) {
 		        const mStr = String(month).padStart(2, '0');
 		        const dateStr = `${year}-${mStr}-${dStr}`;
 		
-		        // 1. ПОЛУЧАЕМ ДАННЫЕ (Лимиты и Брони)
-		        const limitsData = OCP.InitialState.loadState('worker', 'limits_data') || [];
+		        // ТУТ МЫ УЖЕ ПРОСТО ИСПОЛЬЗУЕМ ПЕРЕМЕННУЮ limitsData	       
 		        const limit = limitsData.find(l => l.shiftDate === dateStr && parseInt(l.brigadeId) === parseInt(bId));
 		        
 		        // Считаем все брони в этой ячейке
@@ -100,6 +98,7 @@ function createTable(month, year, daysFilter) {
 					    const count = cellBookings.length;
 					    const max = limit.maxSlots;
 					    const myBooking = cellBookings.find(b => b.user_id === window.workerData.currentUserId);
+					    cellClass = 'clickable';
 					
 					    // Если админ - добавляем ему в ячейку спец. атрибут со всеми ID записей
 					    if (window.workerData.isAdmin) {
@@ -122,8 +121,7 @@ function createTable(month, year, daysFilter) {
 		            // Лимита нет - ячейка "выключена"
 		            cellClass = 'no-limit';
 		            cellContent = '-';
-		        }
-		
+		        }		
 		        html += `<td class="${cellClass}" 
 		                     ${dataIdAttr} 
 		                     data-day="${d}" 
