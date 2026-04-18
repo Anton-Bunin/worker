@@ -119,7 +119,7 @@ function createTable(month, year, daysFilter) {
 					
 					    // Содержимое ячейки
 					    let icon = res; // По умолчанию Д или Н
-					    if (myBooking) icon = '<b>X</b>';
+					    if (myBooking) icon = '<b>!</b>';
 					    if (count >= max && !myBooking) icon = '<small>FULL</small>';
 					
 					    cellContent = `<div class="slot-info">${icon} <small>(${count}/${max})</small></div>`;
