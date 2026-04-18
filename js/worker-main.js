@@ -98,9 +98,18 @@ function createTable(month, year, daysFilter) {
 					    const count = cellBookings.length;
 					    const max = limit.maxSlots;
 					    const myBooking = cellBookings.find(b => b.user_id === window.workerData.currentUserId);
-					    cellClass = 'clickable';
-					
-					    // Если админ - добавляем ему в ячейку спец. атрибут со всеми ID записей
+
+					    cellClass = (res === 'Д') ? 'day clickable' : 'night clickable';
+					    // Цветовая индикация
+					    if (count === 0) {
+					        cellClass += ' status-empty'; // Совсем пусто (опционально)
+					    } else if (count >= max) {
+					        cellClass += ' status-full';   // Мест нет - Красный
+					    } else {
+					        cellClass += ' status-available'; // Места есть - Зеленый
+					    }		
+					   
+					// Если админ - добавляем ему в ячейку спец. атрибут со всеми ID записей
 					    if (window.workerData.isAdmin) {
 					        const ids = cellBookings.map(b => b.id).join(',');
 					        dataIdAttr = `data-ids="${ids}"`; // Сохраняем все ID через запятую
@@ -254,6 +263,22 @@ function initApp() {
 		    return; // Прерываем, чтобы не сработала логика обычной записи
 		}    
 
+			// Если админ кликнул по ячейке (неважно, активной или нет)
+			if (isAdmin && target) {
+			    // Используем Alt+Клик или клик по "выключенной", чтобы вызвать управление лимитом
+			    if (target.classList.contains('no-limit') || (e.altKey && target.classList.contains('clickable'))) {
+			        const date = target.getAttribute('data-date');
+			        const brigade = target.getAttribute('data-brigade');
+			        
+			        const slots = prompt(`Управление вакансиями (${date}):\nВведите количество мест (0 — чтобы полностью отключить дату):`, "5");
+			        
+			        if (slots !== null) {
+			            saveLimitOnServer(date, brigade, parseInt(slots));
+			        }
+			        return;
+			    }
+			}
+		
 		// ЗАЩИТА: Если это не админ и ячейка "выключена" — ничего не делаем
 		if (!isAdmin && target.classList.contains('no-limit')) {
 		    console.log("Доступ закрыт: лимит на эту дату не установлен");
