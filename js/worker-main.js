@@ -119,8 +119,8 @@ function createTable(month, year, daysFilter) {
 					    if (count > 0) cellClass += ' has-records';
 		        } else {
 		            // Лимита нет - ячейка "выключена"
-		            cellClass = 'no-limit';
-		            cellContent = '-';
+				    cellClass = 'no-limit'; 
+				    cellContent = `<div class="slot-info">${res} <small>(выкл)</small></div>`; // было "-"
 		        }		
 		        html += `<td class="${cellClass}" 
 		                     ${dataIdAttr} 
@@ -296,36 +296,80 @@ function cancelShift(id, element) {
 
 //=============================================================================
 function renderBookingsList() {
-    const content = document.getElementById('bookings-list-content');
+ //    const content = document.getElementById('bookings-list-content');
+ //    if (!content) return;
+
+ //    // Берем актуальные данные из памяти
+ //    const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
+
+ //    if (bookings.length === 0) {
+ //        content.innerHTML = '<p style="color: #666;">Список пуст</p>';
+ //        return;
+ //    }
+
+ //    // Сортируем брони по дате (от новых к старым)
+ //    const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
+
+	// let html = '<table class="bookings-table" style="width: auto; min-width: 400px; border-collapse: collapse; font-size: 14px;">';
+	// html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
+	//         '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
+	//         '<th style="padding: 8px 20px;">Бригада</th>' +
+	//         '<th style="padding: 8px 0;">Сотрудник</th></tr>';
+	
+	// sorted.forEach(b => {
+	//     html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+	//                 <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
+	//                 <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
+	//                 <td style="padding: 8px 0;"><strong>${b.displayname}</strong></td>
+	//              </tr>`;
+	// });
+
+ //    html += '</table>';
+ //    content.innerHTML = html;
+ const content = document.getElementById('bookings-list-content');
     if (!content) return;
 
-    // Берем актуальные данные из памяти
     const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
+    const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
 
     if (bookings.length === 0) {
         content.innerHTML = '<p style="color: #666;">Список пуст</p>';
         return;
     }
 
-    // Сортируем брони по дате (от новых к старым)
     const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
 
-	let html = '<table class="bookings-table" style="width: auto; min-width: 400px; border-collapse: collapse; font-size: 14px;">';
-	html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
-	        '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
-	        '<th style="padding: 8px 20px;">Бригада</th>' +
-	        '<th style="padding: 8px 0;">Сотрудник</th></tr>';
-	
-	sorted.forEach(b => {
-	    html += `<tr style="border-bottom: 1px solid #f0f0f0;">
-	                <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
-	                <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
-	                <td style="padding: 8px 0;"><strong>${b.displayname}</strong></td>
-	             </tr>`;
-	});
+    let html = '<table class="bookings-table" style="width: auto; min-width: 500px; border-collapse: collapse; font-size: 14px;">';
+    html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
+            '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
+            '<th style="padding: 8px 20px;">Бригада</th>' +
+            '<th style="padding: 8px 20px;">Сотрудник</th>';
+    
+    if (isAdmin) {
+        html += '<th style="padding: 8px 0;">Действие</th>';
+    }
+    html += '</tr>';
+    
+    sorted.forEach(b => {
+        html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
+                    <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
+                    <td style="padding: 8px 20px;"><strong>${b.displayname || b.user_id}</strong></td>`;
+        
+        if (isAdmin) {
+            html += `<td style="padding: 8px 0;">
+                        <button onclick="cancelShift(${b.id}, this)" 
+                                style="background: none; border: none; color: #d11d1d; cursor: pointer; text-decoration: underline; padding: 0; font-size: 13px;">
+                            Удалить
+                        </button>
+                     </td>`;
+        }
+        html += '</tr>';
+    });
 
     html += '</table>';
     content.innerHTML = html;
+	
 }
 //=============================================================================
 // Поехали!
