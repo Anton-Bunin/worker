@@ -120,7 +120,7 @@ function createTable(month, year, daysFilter) {
 		        } else {
 		            // Лимита нет - ячейка "выключена"
 				    cellClass = 'no-limit'; 
-				    cellContent =  `<div class="slot-info">${res} <small>(выкл)</small></div>`; // было "-"
+				    cellContent =  `<div class="slot-info">${res}</div>`; // было "-"
 		        }		
 		        html += `<td class="${cellClass}" 
 		                     ${dataIdAttr} 
