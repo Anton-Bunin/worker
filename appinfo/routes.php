@@ -7,5 +7,6 @@ return [
 		['name' => 'page#reserve', 'url' => '/reserve', 'verb' => 'POST'],
 		['name' => 'page#cancel', 'url' => '/cancel/{id}', 'verb' => 'POST'],
 	    ['name' => 'page#saveLimit', 'url' => '/saveLimit', 'verb' => 'POST'],
+	    ['name' => 'page#confirm', 'url' => '/confirm/{id}', 'verb' => 'POST'],
     ]
 ];
