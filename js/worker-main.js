@@ -253,6 +253,12 @@ function initApp() {
 		    }
 		    return; // Прерываем, чтобы не сработала логика обычной записи
 		}    
+
+		// ЗАЩИТА: Если это не админ и ячейка "выключена" — ничего не делаем
+		if (!isAdmin && target.classList.contains('no-limit')) {
+		    console.log("Доступ закрыт: лимит на эту дату не установлен");
+		    return; // Просто выходим из функции
+		}		
 		
         // Ищем всех записанных в эту ячейку в глобальном массиве
         const cellBookings = window.workerData.bookings.filter(b => 
