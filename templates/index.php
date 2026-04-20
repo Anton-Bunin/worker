@@ -39,7 +39,7 @@ Util::addStyle('worker', 'worker-main');
 		<div id="bookings-list-content" style="border: 1px solid #ddd; border-radius: 0 0 5px 5px;"></div>
 
    <!-- Место для списка бронирований -->
-	<div id="bookings-list-container" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; max-width: 600px;">
+	<div id="bookings-list-container" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; max-width: 100%;">
 	    <h3 style="margin-top: 0;">Работа в выходной:</h3>
 	    <div id="bookings-list-content"></div>
 	</div>
