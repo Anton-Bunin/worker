@@ -331,7 +331,8 @@ function initApp() {
             reserveShift(date, brigade, type, target);
         }
     });
-
+    render(); 
+} 
 //***************************************************************
 
 	// Находим новые элементы
@@ -392,7 +393,6 @@ function cancelShift(id, element) {
 	});
 }
 //=============================================================================
-
 function renderBookingsList() {
     const content = document.getElementById('bookings-list-content');
     const fM = document.getElementById('list-filter-month');
