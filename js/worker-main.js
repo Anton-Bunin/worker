@@ -100,8 +100,8 @@ function createTable(month, year, daysFilter) {
 		        let cellClass = '';
 		        let cellContent = ''; 
 		        let dataIdAttr = '';
-		
-		        // 2. ЛОГИКА ОТОБРАЖЕНИЯ
+				
+				// 2. ЛОГИКА ОТОБРАЖЕНИЯ
 		        if (limit) {
 					    const count = cellBookings.length;
 					    const max = limit.maxSlots;
@@ -152,7 +152,6 @@ function createTable(month, year, daysFilter) {
 		
 		html += `<td class="total">У:${dayCount} Н:${nightCount}</td></tr>`;
 	}
-
 	html += `</tbody>`;
 	table.innerHTML = html;
 	return table;
@@ -197,7 +196,6 @@ function reserveShift(date, brigade, type, element) {
 		})
 		.then(response => response.json())
 		.then(data => {
-	//		console.log("Данные от сервера:", data);
 			if (data.status === 'success') {
 				element.style.backgroundColor = "#d4edda";
 				alert("Запись сохранена.");
@@ -232,7 +230,8 @@ function initApp() {
 	
     const mInput = document.getElementById('month');
     const yInput = document.getElementById('year');
-    if (mInput && !mInput.value) {
+    if (mInput && !mInput.value)
+	{
         const now = new Date();
         mInput.value = now.getMonth() + 1;
         yInput.value = now.getFullYear();
@@ -279,24 +278,24 @@ function initApp() {
 		    return; // Прерываем, чтобы не сработала логика обычной записи
 		}    
 
-			// Если админ кликнул по ячейке (неважно, активной или нет)
-			if (isAdmin && target) {
-			    // Используем Alt+Клик или клик по "выключенной", чтобы вызвать управление лимитом
-			    if (target.classList.contains('no-limit') || (e.altKey && target.classList.contains('clickable'))) {
-			        const date = target.getAttribute('data-date');
-			        const brigade = target.getAttribute('data-brigade');
-			        
-			        const slots = prompt(`Управление вакансиями (${date}):\nВведите количество мест (0 — чтобы полностью отключить дату):`, "5");
-			        
-			        if (slots !== null) {
-			            saveLimitOnServer(date, brigade, parseInt(slots));
-			        }
-			        return;
-			    }
+		// Если админ кликнул по ячейке (неважно, активной или нет)
+		if (isAdmin && target) 
+		{
+			// Используем Alt+Клик или клик по "выключенной", чтобы вызвать управление лимитом
+			if (target.classList.contains('no-limit') || (e.altKey && target.classList.contains('clickable'))) {
+				const date = target.getAttribute('data-date');
+				const brigade = target.getAttribute('data-brigade');				
+				const slots = prompt(`Управление вакансиями (${date}):\nВведите количество мест (0 — чтобы полностью отключить дату):`, "5");
+				if (slots !== null) {
+					saveLimitOnServer(date, brigade, parseInt(slots));
+				}
+				return;
 			}
+		}
 		
 		// ЗАЩИТА: Если это не админ и ячейка "выключена" — ничего не делаем
-		if (!isAdmin && target.classList.contains('no-limit')) {
+		if (!isAdmin && target.classList.contains('no-limit')) 
+		{
 		    console.log("Доступ закрыт: лимит на эту дату не установлен");
 		    return; // Просто выходим из функции
 		}		
@@ -307,7 +306,8 @@ function initApp() {
         );
 
         // ЛОГИКА УДАЛЕНИЯ (Для админа)
-        if (isAdmin && cellBookings.length > 0) {
+        if (isAdmin && cellBookings.length > 0) 
+		{
             let msg = `Записи на ${date}:\n`;
             cellBookings.forEach((b, i) => {
                 msg += `${i + 1}. ${b.displayname || b.user_id}\n`;
@@ -322,7 +322,8 @@ function initApp() {
 
         // ЛОГИКА ЗАПИСИ (Если записей нет или лимит позволяет)
         const myBookingId = target.dataset.id; 
-        if (myBookingId) {
+        if (myBookingId) 
+		{
             alert('Вы уже записаны. Для отмены обратитесь к администратору.');
         } else if (target.classList.contains('full-cell')) {
             alert('Мест больше нет!');
@@ -331,39 +332,36 @@ function initApp() {
             reserveShift(date, brigade, type, target);
         }
     });
-    render(); 
-} 
-//***************************************************************
 
-	// Находим новые элементы
-const lMonth = document.getElementById('list-filter-month');
-const lYear = document.getElementById('list-filter-year');
+			// Находим новые элементы
+		const lMonth = document.getElementById('list-filter-month');
+		const lYear = document.getElementById('list-filter-year');
 
-if (lMonth && lYear) {
-    // Заполняем месяцы
-    const mNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-    mNames.forEach((name, i) => {
-        let opt = document.createElement('option');
-        opt.value = i + 1;
-        opt.textContent = name;
-        lMonth.appendChild(opt);
-    });
+		if (lMonth && lYear) {
+			// Заполняем месяцы
+			const mNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+			mNames.forEach((name, i) => {
+				let opt = document.createElement('option');
+				opt.value = i + 1;
+				opt.textContent = name;
+				lMonth.appendChild(opt);
+			});
 
-    // Устанавливаем начальные значения как в основном календаре
-    lMonth.value = document.getElementById('month').value;
-    lYear.value = document.getElementById('year').value;
+			// Устанавливаем начальные значения как в основном календаре
+			lMonth.value = document.getElementById('month').value;
+			lYear.value = document.getElementById('year').value;
 
-    // Слушаем изменения
-    lMonth.addEventListener('change', renderBookingsList);
-    lYear.addEventListener('input', renderBookingsList);
+			// Слушаем изменения
+			lMonth.addEventListener('change', renderBookingsList);
+			lYear.addEventListener('input', renderBookingsList);
 
-    // Кнопка синхронизации
-    document.getElementById('sync-list-filter').onclick = () => {
-        lMonth.value = document.getElementById('month').value;
-        lYear.value = document.getElementById('year').value;
-        renderBookingsList();
-    };
-//***************************************************************
+			// Кнопка синхронизации
+			document.getElementById('sync-list-filter').onclick = () => {
+				lMonth.value = document.getElementById('month').value;
+				lYear.value = document.getElementById('year').value;
+				renderBookingsList();
+			};	
+		}
 	
     // Вот он, на своем месте!
     render();  
