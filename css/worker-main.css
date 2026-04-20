@@ -230,7 +230,7 @@ header#header {
 .bookings-table td, 
 .bookings-table th {
     padding: 2px 8px !important; /* Минимум отступов */
-    height: 20px !important;      /* Жесткая высота строки */
+    height: 15px !important;      /* Жесткая высота строки */
     vertical-align: middle;
 }
 
