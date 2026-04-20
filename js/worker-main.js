@@ -69,7 +69,7 @@ function createTable(month, year, daysFilter) {
 			const date = new Date(year, month - 1, d);
 			const dayOfWeek = date.getDay();
 			const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-			html += `<th class="${isWeekend ? 'weekend' : ''}">${d}</th>`;
+			html += `<th class="${isWeekend ? 'holiday_header' : ''}">${d}</th>`;
 		}
 	}
 	html += `<th>Итого</th></tr></thead><tbody>`;
