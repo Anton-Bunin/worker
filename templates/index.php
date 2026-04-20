@@ -41,7 +41,7 @@ Util::addStyle('worker', 'worker-main');
 	            <input type="number" id="list-filter-year" style="width: 60px; font-size: 12px; padding: 2px; border-radius: 3px; border: 1px solid #ccc;">
 	            <button id="sync-list-filter" title="Синхронизировать" style="cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 3px; padding: 1px 5px;">🔄</button>
 	    </div>
-    </div>
+
 
     <!-- Место для самой таблицы -->
     <div id="bookings-list-content"></div>
