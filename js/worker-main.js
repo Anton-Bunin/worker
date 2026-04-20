@@ -431,13 +431,13 @@ function renderBookingsList() {
                     <td style="width: 50px !important; padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
                     <td style="width: auto !important; padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
-                        ${isP ? ' <small style="color:orange; font-size:10px;">(ож.)</small>' : ''}
+                        ${isP ? ' <small style="color:orange; font-size:15px;"> (ожидаем подтверждение) </small>' : ''}
                     </td>`;
         
         if (isAdmin) {
             html += `<td style="width: 120px !important; padding: 2px 8px; text-align: right; white-space: nowrap;">
-                        ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
-                        <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
+                        ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="width: 30px; font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
+                        <button class="admin-delete-btn" data-id="${b.id}" style="font-size:13px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
                     </td>`;
         }
         html += '</tr>';
