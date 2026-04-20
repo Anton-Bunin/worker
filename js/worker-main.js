@@ -414,7 +414,7 @@ function renderBookingsList() {
     // Заголовок с жесткими размерами (ширина Сотрудника НЕ указана, он заберет остаток)
     html += `<tr style="background:#f1f1f1; border-bottom:1px solid #ddd; height: 26px;">
                 <th style="width: 80px !important; padding: 2px 8px; text-align: left;">Дата</th>
-                <th style="width: 50px !important; padding: 2px 8px; text-align: center;">Бр.</th>
+                <th style="width: 50px !important; padding: 2px 8px; text-align: center;">Бригада</th>
                 <th style="width: auto !important; padding: 2px 8px; text-align: left;">Сотрудник</th>
                 ${isAdmin ? '<th style="width: 120px !important; padding: 2px 8px; text-align: right;">Действие</th>' : ''}
             </tr>`;
@@ -437,7 +437,7 @@ function renderBookingsList() {
         if (isAdmin) {
             html += `<td style="width: 120px !important; padding: 2px 8px; text-align: right; white-space: nowrap;">
                         ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
-                        <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Уд.</button>
+                        <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
                     </td>`;
         }
         html += '</tr>';
