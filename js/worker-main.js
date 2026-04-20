@@ -386,67 +386,61 @@ function cancelShift(id, element) {
 
 //=============================================================================
 	function renderBookingsList() {
-	    const content = document.getElementById('bookings-list-content');
-	    if (!content) return;
-	
-	    const bookings = (window.workerData && window.workerData.bookings) ? window.workerData.bookings : [];
-	    const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
-	
-	    if (bookings.length === 0) {
-	        content.innerHTML = '<p style="color: #666;">Список пуст</p>';
-	        return;
-	    }
-	
-	    const sorted = [...bookings].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
-	
-	    let html = '<table class="bookings-table" style="width: auto; min-width: 500px; border-collapse: collapse; font-size: 14px;">';
-	    html += '<tr style="border-bottom: 2px solid #007bff; text-align: left; color: #555;">' +
-	            '<th style="padding: 8px 20px 8px 0;">Дата</th>' +
-	            '<th style="padding: 8px 20px;">Бригада</th>' +
-	            '<th style="padding: 8px 20px;">Сотрудник</th>';
-	    
-	    if (isAdmin) {
-	        html += '<th style="padding: 8px 0;">Действие</th>';
-	    }
-	    html += '</tr>';
-	    
-	    sorted.forEach(b => {
-	        // Если запись не подтверждена, сделаем текст сотрудника чуть бледнее
-	        const isPending = b.status === 'pending';
-	        const rowStyle = isPending ? 'color: #999;' : '';
-	
-	        html += `<tr style="border-bottom: 1px solid #f0f0f0; ${rowStyle}">
-	                    <td style="padding: 8px 20px 8px 0; white-space: nowrap;">${b.shift_date}</td>
-	                    <td style="padding: 8px 20px;">Бригада №${b.brigade_id}</td>
-	                    <td style="padding: 8px 20px;">
-	                        <strong>${b.displayname || b.user_id}</strong>
-	                        ${isPending ? ' <small>(ожидает)</small>' : ''}
-	                    </td>`;
-	        
-	        if (isAdmin) {
-	            html += `<td style="padding: 8px 0;">`;
-	            
-	            // Если статус pending — показываем кнопку Одобрить
-	            if (isPending) {
-	                html += `<button class="admin-confirm-btn" 
-	                                data-id="${b.id}"
-	                                style="background: #28a745; border: none; color: white; cursor: pointer; border-radius: 3px; padding: 2px 8px; margin-right: 10px; font-size: 12px;">
-	                            Одобрить
-	                        </button>`;
-	            }
-	
-	            html += `<button class="admin-delete-btn" 
-	                        data-id="${b.id}"
-	                        style="background: none; border: none; color: #d11d1d; cursor: pointer; text-decoration: underline; padding: 0; font-size: 13px;">
-	                    Удалить
-	                </button>
-	             </td>`;
-	        }
-	        html += '</tr>';
-	    });
-	
-	    html += '</table>';
-	    content.innerHTML = html;	
+	  const content = document.getElementById('bookings-list-content');
+    const fM = document.getElementById('list-filter-month');
+    const fY = document.getElementById('list-filter-year');
+    if (!content || !fM || !fY) return;
+
+    const selM = parseInt(fM.value);
+    const selY = parseInt(fY.value);
+    const bookings = window.workerData.bookings || [];
+    const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
+
+    // Фильтруем по выбранному в списке месяцу
+    const filtered = bookings.filter(b => {
+        const d = new Date(b.shift_date);
+        return (d.getMonth() + 1) === selM && d.getFullYear() === selY;
+    });
+
+    if (filtered.length === 0) {
+        content.innerHTML = '<div style="padding:10px; font-size:12px; color:#999;">Нет записей за этот период</div>';
+        return;
+    }
+
+    const sorted = [...filtered].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
+
+    let html = '<table style="width:100%; border-collapse:collapse; font-size:12px; line-height:1;">';
+    // Заголовок
+    html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
+            '<th style="padding:4px 8px;">Дата</th><th style="padding:4px 8px;">Бригада</th>' +
+            '<th style="padding:4px 8px;">Сотрудник</th>' +
+            (isAdmin ? '<th style="padding:4px 8px;">Действие</th>' : '') + '</tr>';
+
+    sorted.forEach(b => {
+        const isP = b.status === 'pending';
+        // Максимально сжатая строка (height: 20px)
+        html += `<tr style="border-bottom: 1px solid #eee; height: 20px; ${isP ? 'background:#fffcf5;' : ''}">
+            <td style="padding: 2px 8px;">${b.shift_date}</td>
+            <td style="padding: 2px 8px;">Бриг. №${b.brigade_id}</td>
+            <td style="padding: 2px 8px;">
+                <strong>${b.displayname || b.user_id}</strong> 
+                ${isP ? '<span style="color:#e67e22; font-size:10px;">(ожидает)</span>' : ''}
+            </td>`;
+        if (isAdmin) {
+            html += `<td style="padding: 2px 8px;">
+                ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
+                <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
+            </td>`;
+        }
+        html += '</tr>';
+    });
+
+    html += '</table>';
+    // Добавим итог внизу таблицы
+    html += `<div style="background:#f9f9f9; padding:4px 8px; font-size:11px; border-top:1px solid #ddd; text-align:right;">
+                Всего подтвержденных смен: <strong>${filtered.filter(x => x.status === 'confirmed').length}</strong>
+             </div>`;
+    content.innerHTML = html;
 	}
 //=============================================================================
 	function saveLimitOnServer(date, brigade, slots) {
