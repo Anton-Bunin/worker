@@ -425,41 +425,34 @@ function renderBookingsList() {
 	        (isAdmin ? '<th style="padding:4px 8px; width: 90px; text-align:right;">Действие</th>' : '') + 
 	        '</tr>';
 
- sorted.forEach(b => {
-        const isP = b.status === 'pending';
-        const shortDate = formatDateShort(b.shift_date);
-        
-        // Подсветка выходных
-        const dObj = new Date(b.shift_date);
-        const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
-        const dateStyle = isWeekend ? 'color: #d32f2f; font-weight: bold;' : '';
-
-        // Начинаем строку
-        html += `<tr style="border-bottom: 1px solid #eee; height: 24px; ${isP ? 'background:#fffcf5;' : ''}">`;
-        
-        // Колонка 1: Дата
-        html += `<td style="padding: 2px 8px; ${dateStyle}">${shortDate}</td>`;
-        
-        // Колонка 2: Бригада
-        html += `<td style="padding: 2px 8px; text-align: center;">${b.brigade_id}</td>`;
-        
-        // Колонка 3: Сотрудник (максимально широкая)
-        html += `<td style="padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                    <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
-                    ${isP ? ' <small style="color:#e67e22; font-size:10px;">(ож.)</small>' : ''}
-                 </td>`;
-        
-        // Колонка 4: Действие (только для админа)
-        if (isAdmin) {
-            html += `<td style="padding: 2px 8px; text-align: right;">
-                ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
-                <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Уд.</button>
-            </td>`;
-        }
-
-        html += `</tr>`; // Закрываем строку
-    });
-
+	sorted.forEach(b => {
+			const isP = b.status === 'pending';
+			const shortDate = formatDateShort(b.shift_date);
+			
+			// Начинаем строку
+			html += `<tr style="border-bottom: 1px solid #eee; height: 24px; ${isP ? 'background:#fffcf5;' : ''}">`;
+			
+			// Колонка 1: Дата
+			html += `<td style="width: 70px;">${shortDate}</td>`;
+			
+			// Колонка 2: Бригада
+			html += `<td style="width: 40px; text-align: center;">${b.brigade_id}</td>`;
+			
+			// Колонка 3: Сотрудник (БЕЗ указания ширины — она заберет весь остаток)
+			html += `<td style="text-align: left;">
+						<strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
+					 </td>`;
+			
+			// Колонка 4: Действие
+			if (isAdmin) {
+				html += `<td style="width: 90px; text-align: right;">
+					${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="...">ОК</button>` : ''}
+					<button class="admin-delete-btn" data-id="${b.id}" style="...">Уд.</button>
+				</td>`;
+			}
+	
+			html += `</tr>`; // Закрываем строку
+		});
     html += '</table>';
     html += `<div style="background:#f9f9f9; padding:4px 8px; font-size:11px; border-top:1px solid #ddd; text-align:right;">
                 Всего подтвержденных: <strong>${filtered.filter(x => x.status === 'confirmed').length}</strong>
