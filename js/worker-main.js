@@ -324,6 +324,38 @@ function initApp() {
         }
     });
 
+//***************************************************************
+
+	// Находим новые элементы
+const lMonth = document.getElementById('list-filter-month');
+const lYear = document.getElementById('list-filter-year');
+
+if (lMonth && lYear) {
+    // Заполняем месяцы
+    const mNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    mNames.forEach((name, i) => {
+        let opt = document.createElement('option');
+        opt.value = i + 1;
+        opt.textContent = name;
+        lMonth.appendChild(opt);
+    });
+
+    // Устанавливаем начальные значения как в основном календаре
+    lMonth.value = document.getElementById('month').value;
+    lYear.value = document.getElementById('year').value;
+
+    // Слушаем изменения
+    lMonth.addEventListener('change', renderBookingsList);
+    lYear.addEventListener('input', renderBookingsList);
+
+    // Кнопка синхронизации
+    document.getElementById('sync-list-filter').onclick = () => {
+        lMonth.value = document.getElementById('month').value;
+        lYear.value = document.getElementById('year').value;
+        renderBookingsList();
+    };
+//***************************************************************
+	
     // Вот он, на своем месте!
     render();  
 }
