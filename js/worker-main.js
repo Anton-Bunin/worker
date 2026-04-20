@@ -415,16 +415,16 @@ function renderBookingsList() {
 
     const sorted = [...filtered].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
 
-    // 1. Добавляем min-width: 100% и оставляем table-layout: fixed
-    let html = '<table style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1; table-layout: fixed;">';
-    
-    // 2. В заголовке даем Сотруднику width: 100%
-    html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
-            '<th style="padding:4px 8px; width: 70px;">Дата</th>' + 
-            '<th style="padding:4px 8px; width: 50px;">Бр.</th>' + 
-            '<th style="padding:4px 8px; width: 100%;">Сотрудник</th>' + // ВОТ ТУТ 100%
-            (isAdmin ? '<th style="padding:4px 8px; width: 90px; text-align:right;">Действие</th>' : '') + 
-            '</tr>';
+	// Внутри renderBookingsList замени начало таблицы на это:
+	let html = '<table class="bookings-table" style="border-collapse: collapse; font-size: 12px; line-height: 1;">';
+	
+	// Заголовок (у Сотрудника ширину НЕ указываем, он заберет остаток от 100%)
+	html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
+	        '<th style="padding:4px 8px; width: 70px;">Дата</th>' + 
+	        '<th style="padding:4px 8px; width: 40px;">Бр.</th>' + 
+	        '<th style="padding:4px 8px;">Сотрудник</th>' + 
+	        (isAdmin ? '<th style="padding:4px 8px; width: 90px; text-align:right;">Действие</th>' : '') + 
+	        '</tr>';
 
  sorted.forEach(b => {
         const isP = b.status === 'pending';
