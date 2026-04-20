@@ -416,7 +416,7 @@ function renderBookingsList() {
                 <th style="width: 80px !important; padding: 2px 8px; text-align: left;">Дата</th>
                 <th style="width: 50px !important; padding: 2px 8px; text-align: left;">Бригада</th>
                 <th style="width: auto !important; padding: 2px 8px; text-align: left;">Сотрудник</th>
-                ${isAdmin ? '<th style="width: 120px !important; padding: 2px 8px; text-align: right;">Действие</th>' : ''}
+                ${isAdmin ? '<th style="width: 170px !important; padding: 2px 8px; text-align: right;">Действие</th>' : ''}
             </tr>`;
     sorted.forEach(b => {
         const isP = b.status === 'pending';
@@ -428,7 +428,7 @@ function renderBookingsList() {
         // Начинаем строку. Важно: сбрасываем высоту
         html += `<tr style="border-bottom: 1px solid #eee; height: 24px !important; ${isP ? 'background:#fffcf5;' : ''}">
                     <td style="width: 80px !important; padding: 2px 8px; white-space: nowrap; ${dateStyle}">${shortDate}</td>
-                    <td style="width: 50px !important; padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
+                    <td style="width: 70px !important; padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
                     <td style="width: auto !important; padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                         <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
                         ${isP ? ' <small style="color:orange; font-size:15px;"> (ожидаем подтверждение) </small>' : ''}
