@@ -392,8 +392,8 @@ function formatDateShort(dateStr) {
     return `${day}.${month}.${year}`;
 }
 //=============================================================================
-	function renderBookingsList() {
-	  const content = document.getElementById('bookings-list-content');
+function renderBookingsList() {
+    const content = document.getElementById('bookings-list-content');
     const fM = document.getElementById('list-filter-month');
     const fY = document.getElementById('list-filter-year');
     if (!content || !fM || !fY) return;
@@ -403,7 +403,6 @@ function formatDateShort(dateStr) {
     const bookings = window.workerData.bookings || [];
     const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
 
-    // Фильтруем по выбранному в списке месяцу
     const filtered = bookings.filter(b => {
         const d = new Date(b.shift_date);
         return (d.getMonth() + 1) === selM && d.getFullYear() === selY;
@@ -416,43 +415,44 @@ function formatDateShort(dateStr) {
 
     const sorted = [...filtered].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
 
-    let html = '<table style="width:100%; border-collapse:collapse; font-size:12px; line-height:1;">';
-    // Заголовок
-	html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
-            '<th style="padding:4px 8px; width: 80px;">Дата</th>' +      // Фикс ширина
-            '<th style="padding:4px 8px; width: 80px;">Бригада</th>' +   // Фикс ширина
-            '<th style="padding:4px 8px;">Сотрудник</th>' +             // Займет всё остальное место
-            (isAdmin ? '<th style="padding:4px 8px; width: 100px;">Действие</th>' : '') + 
+    // Используем table-layout: fixed чтобы колонки не "гуляли"
+    let html = '<table style="width:100%; border-collapse:collapse; font-size:12px; line-height:1; table-layout: fixed;">';
+    
+    // Заголовок: Дата и Бригада - узкие, Сотрудник - БЕЗ ширины (заберет всё остальное)
+    html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
+            '<th style="padding:4px 8px; width: 65px;">Дата</th>' + 
+            '<th style="padding:4px 8px; width: 40px;">Бр.</th>' + 
+            '<th style="padding:4px 8px;">Сотрудник</th>' + 
+            (isAdmin ? '<th style="padding:4px 8px; width: 90px;">Действие</th>' : '') + 
             '</tr>';
 
     sorted.forEach(b => {
-	     const isP = b.status === 'pending';
-	     const shortDate = formatDateShort(b.shift_date); // Превращаем 2026-05-20 в 20.05.26
+        const isP = b.status === 'pending';
+        const shortDate = formatDateShort(b.shift_date);
 	
-	    html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
-	        <td style="padding: 2px 8px; width: 65px; white-space: nowrap;">${shortDate}</td>
-	        <td style="padding: 2px 8px; width: 40px; text-align: center;">${b.brigade_id}</td>
-	        <td style="padding: 2px 8px;">
-	            <strong>${b.displayname || b.user_id}</strong>
-	            ${isP ? '<br><small style="color:#e67e22; font-size:9px;">(ожидает)</small>' : ''}
-	        </td>`;
+        html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
+            <td style="padding: 2px 8px; white-space: nowrap;">${shortDate}</td>
+            <td style="padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
+            <td style="padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
+                ${isP ? ' <small style="color:#e67e22; font-size:9px;">(ож.)</small>' : ''}
+            </td>`;
        
-		if (isAdmin) {
-            html += `<td style="padding: 2px 8px;">
+        if (isAdmin) {
+            html += `<td style="padding: 2px 8px; text-align: right;">
                 ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
-                <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
+                <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Уд.</button>
             </td>`;
         }
         html += '</tr>';
     });
 
     html += '</table>';
-    // Добавим итог внизу таблицы
     html += `<div style="background:#f9f9f9; padding:4px 8px; font-size:11px; border-top:1px solid #ddd; text-align:right;">
-                Всего подтвержденных смен: <strong>${filtered.filter(x => x.status === 'confirmed').length}</strong>
+                Всего подтвержденных: <strong>${filtered.filter(x => x.status === 'confirmed').length}</strong>
              </div>`;
     content.innerHTML = html;
-	}
+}
 //=============================================================================
 	function saveLimitOnServer(date, brigade, slots) {
 	    const formData = new FormData();
