@@ -414,7 +414,7 @@ function renderBookingsList() {
     // Заголовок с жесткими размерами (ширина Сотрудника НЕ указана, он заберет остаток)
     html += `<tr style="background:#f1f1f1; border-bottom:1px solid #ddd; height: 26px;">
                 <th style="width: 80px !important; padding: 2px 8px; text-align: left;">Дата</th>
-                <th style="width: 50px !important; padding: 2px 8px; text-align: center;">Бригада</th>
+                <th style="width: 50px !important; padding: 2px 8px; text-align: left;">Бригада</th>
                 <th style="width: auto !important; padding: 2px 8px; text-align: left;">Сотрудник</th>
                 ${isAdmin ? '<th style="width: 120px !important; padding: 2px 8px; text-align: right;">Действие</th>' : ''}
             </tr>`;
