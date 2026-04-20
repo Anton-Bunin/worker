@@ -383,7 +383,14 @@ function cancelShift(id, element) {
 	    }
 	});
 }
-
+//=============================================================================
+function formatDateShort(dateStr) {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2); // Берем только две последние цифры года
+    return `${day}.${month}.${year}`;
+}
 //=============================================================================
 	function renderBookingsList() {
 	  const content = document.getElementById('bookings-list-content');
@@ -419,14 +426,16 @@ function cancelShift(id, element) {
             '</tr>';
 
     sorted.forEach(b => {
-        const isP = b.status === 'pending';
-        html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
-            <td style="padding: 2px 8px; overflow: hidden; white-space: nowrap;">${b.shift_date}</td>
-            <td style="padding: 2px 8px; overflow: hidden; white-space: nowrap;">Бриг. №${b.brigade_id}</td>
-            <td style="padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong> 
-                ${isP ? '<span style="color:#e67e22; font-size:10px;">(ожидает)</span>' : ''}
-            </td>`;
+	     const isP = b.status === 'pending';
+	     const shortDate = formatDateShort(b.shift_date); // Превращаем 2026-05-20 в 20.05.26
+	
+	    html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
+	        <td style="padding: 2px 8px; width: 65px; white-space: nowrap;">${shortDate}</td>
+	        <td style="padding: 2px 8px; width: 40px; text-align: center;">${b.brigade_id}</td>
+	        <td style="padding: 2px 8px;">
+	            <strong>${b.displayname || b.user_id}</strong>
+	            ${isP ? '<br><small style="color:#e67e22; font-size:9px;">(ожидает)</small>' : ''}
+	        </td>`;
        
 		if (isAdmin) {
             html += `<td style="padding: 2px 8px;">
