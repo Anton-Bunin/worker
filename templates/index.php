@@ -29,14 +29,15 @@ Util::addStyle('worker', 'worker-main');
 		<thead><tr id="header-days"></tr></thead>
 		<tbody id="tabel-body"></tbody>
 	</table>
-<!-- 
-	<div class="bookings-filter-controls" style="margin-bottom: 10px; padding: 10px; background: #f0f4f7; border-radius: 5px; display: flex; gap: 10px; align-items: center;">
-	    <span style="font-weight: bold; font-size: 13px;">Фильтр списка:</span>
-	    <select id="list-filter-month" style="font-size: 12px; padding: 2px;"></select>
-	    <input type="number" id="list-filter-year" style="width: 60px; font-size: 12px; padding: 2px;">
-	    <button id="reset-list-filter" style="font-size: 11px; cursor: pointer;">Сбросить (как в графике)</button>
-	</div>
--->	
+ 
+		<div class="bookings-list-header" style="display: flex; align-items: center; gap: 10px; background: #f1f1f1; padding: 5px 10px; border-radius: 5px 5px 0 0; border: 1px solid #ddd; border-bottom: none; margin-top: 20px;">
+		    <span style="font-weight: bold; font-size: 12px; color: #555;">Список записей:</span>
+		    <select id="list-filter-month" style="font-size: 12px; padding: 1px;"></select>
+		    <input type="number" id="list-filter-year" style="width: 55px; font-size: 12px; padding: 1px;">
+		    <button id="sync-list-filter" title="Синхронизировать с календарем" style="padding: 1px 5px; font-size: 11px; cursor: pointer;">🔄</button>
+		</div>
+		<div id="bookings-list-content" style="border: 1px solid #ddd; border-radius: 0 0 5px 5px;"></div>
+
    <!-- Место для списка бронирований -->
 	<div id="bookings-list-container" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; max-width: 600px;">
 	    <h3 style="margin-top: 0;">Работа в выходной:</h3>
