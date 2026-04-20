@@ -436,7 +436,7 @@ function renderBookingsList() {
         
         if (isAdmin) {
             html += `<td style="width: 120px !important; padding: 2px 8px; text-align: right; white-space: nowrap;">
-                        ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="width: 30px; font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
+                        ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:9px; padding:0 4px; height: 14px; min-width: 50px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
                         <button class="admin-delete-btn" data-id="${b.id}" style="font-size:13px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
                     </td>`;
         }
