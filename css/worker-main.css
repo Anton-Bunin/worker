@@ -225,10 +225,20 @@ header#header {
 
 /* Специальное правило для таблицы списка, чтобы она растягивалась */
 .bookings-table {
-    width: 100% !important;
-    table-layout: fixed;
+    line-height: 1 !important; /* Убираем межстрочные интервалы */
+}
+.bookings-table td, 
+.bookings-table th {
+    padding: 2px 8px !important; /* Минимум отступов */
+    height: 20px !important;      /* Жесткая высота строки */
+    vertical-align: middle;
 }
 
+.bookings-table button {
+    margin: 0 !important;
+    padding: 0 4px !important;
+    line-height: 1.2;
+}
 #header .action-item, 
 #header .logo, 
 #header .header-appname {
