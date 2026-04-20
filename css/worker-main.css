@@ -249,8 +249,10 @@ header#header {
 }
 /* 1. ГАРАНТИРУЕМ ШИРИНУ КОНТЕЙНЕРА */
 #bookings-list-container {
-    max-width: 100% !important;
-    width: 100% !important;
+    max-width: 800px !important; /* Ограничиваем "раздувание" */
+    width: 100%;                 /* Но разрешаем сжиматься на мобилках */
+    margin-left: 0;              /* Прижимаем к левому краю, как календарь */
+    margin-right: auto;
 }
 /* 2. СБРОС КВАДРАТОВ 30x30 ДЛЯ ТАБЛИЦЫ СПИСКА */
 #bookings-list-content td, 
