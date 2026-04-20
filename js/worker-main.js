@@ -426,7 +426,7 @@ function renderBookingsList() {
         const dateStyle = isWeekend ? 'color: red; font-weight: bold;' : '';
 
         // Начинаем строку. Важно: сбрасываем высоту
-        html += `<tr style="border-bottom: 1px solid #eee; height: 18px !important; ${isP ? 'background:#fffcf5;' : ''}">
+        html += `<tr style="border-bottom: 1px solid #eee; height: 15px !important; ${isP ? 'background:#fffcf5;' : ''}">
                     <td style="width: 80px !important; padding: 2px 8px; white-space: nowrap; ${dateStyle}">${shortDate}</td>
                     <td style="width: 70px !important; padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
                     <td style="width: auto !important; padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
