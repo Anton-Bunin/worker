@@ -392,71 +392,61 @@ function cancelShift(id, element) {
 }
 //=============================================================================
 function renderBookingsList() {
-    const content = document.getElementById('bookings-list-content');
+     const content = document.getElementById('bookings-list-content');
     const fM = document.getElementById('list-filter-month');
     const fY = document.getElementById('list-filter-year');
     if (!content || !fM || !fY) return;
-
     const selM = parseInt(fM.value);
     const selY = parseInt(fY.value);
     const bookings = window.workerData.bookings || [];
     const isAdmin = window.workerData.isAdmin === true || window.workerData.isAdmin === 'true';
-
     const filtered = bookings.filter(b => {
         const d = new Date(b.shift_date);
         return (d.getMonth() + 1) === selM && d.getFullYear() === selY;
     });
-
     if (filtered.length === 0) {
-        content.innerHTML = '<div style="padding:10px; font-size:12px; color:#999;">Нет записей за этот период</div>';
+        content.innerHTML = '<div style="padding:10px; font-size:12px; color:#999;">Нет записей</div>';
         return;
     }
-
     const sorted = [...filtered].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
+    // СИЛОВОЙ МЕТОД: width: 100% + table-layout: fixed
+    let html = '<table style="width: 100% !important; min-width: 100% !important; border-collapse: collapse; font-size: 13px; table-layout: fixed !important; margin: 0 !important;">';    
+    // Заголовок с жесткими размерами (ширина Сотрудника НЕ указана, он заберет остаток)
+    html += `<tr style="background:#f1f1f1; border-bottom:1px solid #ddd; height: 26px;">
+                <th style="width: 80px !important; padding: 2px 8px; text-align: left;">Дата</th>
+                <th style="width: 50px !important; padding: 2px 8px; text-align: center;">Бр.</th>
+                <th style="width: auto !important; padding: 2px 8px; text-align: left;">Сотрудник</th>
+                ${isAdmin ? '<th style="width: 120px !important; padding: 2px 8px; text-align: right;">Действие</th>' : ''}
+            </tr>`;
+    sorted.forEach(b => {
+        const isP = b.status === 'pending';
+        const shortDate = formatDateShort(b.shift_date);
+        const dObj = new Date(b.shift_date);
+        const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
+        const dateStyle = isWeekend ? 'color: red; font-weight: bold;' : '';
 
-	// Внутри renderBookingsList замени начало таблицы на это:
-	let html = '<table class="bookings-table" style="border-collapse: collapse; font-size: 12px; line-height: 1;">';
-	
-	// Заголовок (у Сотрудника ширину НЕ указываем, он заберет остаток от 100%)
-	html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
-	        '<th style="padding:4px 8px; width: 70px;">Дата</th>' + 
-	        '<th style="padding:4px 8px; width: 40px;">Бр.</th>' + 
-	        '<th style="padding:4px 8px;">Сотрудник</th>' + 
-	        (isAdmin ? '<th style="padding:4px 8px; width: 90px; text-align:right;">Действие</th>' : '') + 
-	        '</tr>';
-
-	sorted.forEach(b => {
-			const isP = b.status === 'pending';
-			const shortDate = formatDateShort(b.shift_date);
-			
-			// Начинаем строку
-			html += `<tr style="border-bottom: 1px solid #eee; height: 24px; ${isP ? 'background:#fffcf5;' : ''}">`;
-			
-			// Колонка 1: Дата
-			html += `<td style="width: 70px;">${shortDate}</td>`;
-			
-			// Колонка 2: Бригада
-			html += `<td style="width: 40px; text-align: center;">${b.brigade_id}</td>`;
-			
-			// Колонка 3: Сотрудник (БЕЗ указания ширины — она заберет весь остаток)
-			html += `<td style="text-align: left;">
-						<strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
-					 </td>`;
-			
-			// Колонка 4: Действие
-			if (isAdmin) {
-				html += `<td style="width: 90px; text-align: right;">
-					${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="...">ОК</button>` : ''}
-					<button class="admin-delete-btn" data-id="${b.id}" style="...">Уд.</button>
-				</td>`;
-			}
-	
-			html += `</tr>`; // Закрываем строку
-		});
-    html += '</table>';
-    html += `<div style="background:#f9f9f9; padding:4px 8px; font-size:11px; border-top:1px solid #ddd; text-align:right;">
+        // Начинаем строку. Важно: сбрасываем высоту
+        html += `<tr style="border-bottom: 1px solid #eee; height: 24px !important; ${isP ? 'background:#fffcf5;' : ''}">
+                    <td style="width: 80px !important; padding: 2px 8px; white-space: nowrap; ${dateStyle}">${shortDate}</td>
+                    <td style="width: 50px !important; padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
+                    <td style="width: auto !important; padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
+                        ${isP ? ' <small style="color:orange; font-size:10px;">(ож.)</small>' : ''}
+                    </td>`;
+        
+        if (isAdmin) {
+            html += `<td style="width: 120px !important; padding: 2px 8px; text-align: right; white-space: nowrap;">
+                        ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
+                        <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Уд.</button>
+                    </td>`;
+        }
+        html += '</tr>';
+    });
+    html += '</table>';    
+    // Подвал с итогом
+    html += `<div style="background:#f9f9f9; padding:4px 10px; font-size:11px; border:1px solid #ddd; border-top:none; text-align:right;">
                 Всего подтвержденных: <strong>${filtered.filter(x => x.status === 'confirmed').length}</strong>
-             </div>`;
+             </div>`;             
     content.innerHTML = html;
 }
 //=============================================================================
