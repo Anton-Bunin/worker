@@ -388,7 +388,7 @@ function formatDateShort(dateStr) {
     const d = new Date(dateStr);
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = String(d.getFullYear()).slice(-2); // Берем только две последние цифры года
+    const year = String(d.getFullYear()).slice(-2); 
     return `${day}.${month}.${year}`;
 }
 //=============================================================================
@@ -416,27 +416,32 @@ function renderBookingsList() {
     const sorted = [...filtered].sort((a, b) => new Date(a.shift_date) - new Date(b.shift_date));
 
     // Используем table-layout: fixed чтобы колонки не "гуляли"
-    let html = '<table style="width:100%; border-collapse:collapse; font-size:12px; line-height:1; table-layout: fixed;">';
-    
+    let html = '<table style="width: 100%; min-width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1; table-layout: fixed;">';
+	
     // Заголовок: Дата и Бригада - узкие, Сотрудник - БЕЗ ширины (заберет всё остальное)
-    html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
-            '<th style="padding:4px 8px; width: 65px;">Дата</th>' + 
-            '<th style="padding:4px 8px; width: 40px;">Бр.</th>' + 
-            '<th style="padding:4px 8px;">Сотрудник</th>' + 
-            (isAdmin ? '<th style="padding:4px 8px; width: 90px;">Действие</th>' : '') + 
-            '</tr>';
+	html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
+	        '<th style="padding:4px 8px; width: 70px;">Дата</th>' +    // Узкая
+	        '<th style="padding:4px 8px; width: 70px;">Бригада</th>' + // Узкая
+	        '<th style="padding:4px 8px;">Сотрудник</th>' +           // ВСЁ ОСТАЛЬНОЕ МЕСТО
+	        (isAdmin ? '<th style="padding:4px 8px; width: 90px; text-align:right;">Действие</th>' : '') + 
+	        '</tr>';
 
     sorted.forEach(b => {
-        const isP = b.status === 'pending';
-        const shortDate = formatDateShort(b.shift_date);
+	    const isP = b.status === 'pending';
+	    const shortDate = formatDateShort(b.shift_date);
 	
-        html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
-            <td style="padding: 2px 8px; white-space: nowrap;">${shortDate}</td>
-            <td style="padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
-            <td style="padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
-                ${isP ? ' <small style="color:#e67e22; font-size:9px;">(ож.)</small>' : ''}
-            </td>`;
+	    // ПРОВЕРКА ВЫХОДНОГО:
+	    const dObj = new Date(b.shift_date);
+	    const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6); // 0-Вс, 6-Сб
+	    const dateColor = isWeekend ? 'color: #d32f2f; font-weight: bold;' : '';
+	
+	    html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
+	        <td style="padding: 2px 8px; white-space: nowrap; ${dateColor}">${shortDate}</td>
+	        <td style="padding: 2px 8px;">Бр. ${b.brigade_id}</td>
+	        <td style="padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+	            <strong>${b.displayname || b.user_id}</strong>
+	            ${isP ? ' <small style="color:#e67e22; font-size:9px;">(ож.)</small>' : ''}
+	        </td>`;
        
         if (isAdmin) {
             html += `<td style="padding: 2px 8px; text-align: right;">
