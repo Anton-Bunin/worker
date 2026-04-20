@@ -223,6 +223,12 @@ header#header {
     background-color: #0082c9 !important;
 }
 
+/* Специальное правило для таблицы списка, чтобы она растягивалась */
+.bookings-table {
+    width: 100% !important;
+    table-layout: fixed;
+}
+
 #header .action-item, 
 #header .logo, 
 #header .header-appname {
