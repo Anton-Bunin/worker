@@ -239,6 +239,28 @@ header#header {
     padding: 0 4px !important;
     line-height: 1.2;
 }
+
+#bookings-list-content table {
+    width: 100% !important;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: none !important; /* Убираем внешнюю рамку, она уже есть у контейнера */
+}
+
+#bookings-list-content td, 
+#bookings-list-content th {
+    height: 24px !important;   /* Компактная высота */
+    padding: 2px 10px !important;
+    font-size: 13px;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+#bookings-list-content tr:hover {
+    background-color: #fcfcfc; /* Легкая подсветка строки при наведении */
+}
+
+
 #header .action-item, 
 #header .logo, 
 #header .header-appname {
