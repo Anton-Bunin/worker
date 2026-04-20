@@ -429,26 +429,35 @@ function renderBookingsList() {
         const isP = b.status === 'pending';
         const shortDate = formatDateShort(b.shift_date);
         
-        // Проверка выходного для цвета
+        // Подсветка выходных
         const dObj = new Date(b.shift_date);
         const isWeekend = (dObj.getDay() === 0 || dObj.getDay() === 6);
         const dateStyle = isWeekend ? 'color: #d32f2f; font-weight: bold;' : '';
 
-        html += `<tr style="border-bottom: 1px solid #eee; height: 24px; ${isP ? 'background:#fffcf5;' : ''}">
-            <td style="padding: 2px 8px; ${dateStyle}">${shortDate}</td>
-            <td style="padding: 2px 8px; text-align: center;">${b.brigade_id}</td>
-            <td style="padding: 2px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
-                ${isP ? ' <small style="color:#e67e22; font-size:10px;">(ож.)</small>' : ''}
-            </td>`;
-       
+        // Начинаем строку
+        html += `<tr style="border-bottom: 1px solid #eee; height: 24px; ${isP ? 'background:#fffcf5;' : ''}">`;
+        
+        // Колонка 1: Дата
+        html += `<td style="padding: 2px 8px; ${dateStyle}">${shortDate}</td>`;
+        
+        // Колонка 2: Бригада
+        html += `<td style="padding: 2px 8px; text-align: center;">${b.brigade_id}</td>`;
+        
+        // Колонка 3: Сотрудник (максимально широкая)
+        html += `<td style="padding: 2px 8px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong>
+                    ${isP ? ' <small style="color:#e67e22; font-size:10px;">(ож.)</small>' : ''}
+                 </td>`;
+        
+        // Колонка 4: Действие (только для админа)
         if (isAdmin) {
             html += `<td style="padding: 2px 8px; text-align: right;">
                 ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
                 <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Уд.</button>
             </td>`;
         }
-        html += '</tr>';
+
+        html += `</tr>`; // Закрываем строку
     });
 
     html += '</table>';
