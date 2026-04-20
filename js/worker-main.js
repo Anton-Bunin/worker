@@ -411,22 +411,24 @@ function cancelShift(id, element) {
 
     let html = '<table style="width:100%; border-collapse:collapse; font-size:12px; line-height:1;">';
     // Заголовок
-    html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
-            '<th style="padding:4px 8px;">Дата</th><th style="padding:4px 8px;">Бригада</th>' +
-            '<th style="padding:4px 8px;">Сотрудник</th>' +
-            (isAdmin ? '<th style="padding:4px 8px;">Действие</th>' : '') + '</tr>';
+	html += '<tr style="background:#f9f9f9; border-bottom:1px solid #ddd; text-align:left;">' +
+            '<th style="padding:4px 8px; width: 80px;">Дата</th>' +      // Фикс ширина
+            '<th style="padding:4px 8px; width: 80px;">Бригада</th>' +   // Фикс ширина
+            '<th style="padding:4px 8px;">Сотрудник</th>' +             // Займет всё остальное место
+            (isAdmin ? '<th style="padding:4px 8px; width: 100px;">Действие</th>' : '') + 
+            '</tr>';
 
     sorted.forEach(b => {
         const isP = b.status === 'pending';
-        // Максимально сжатая строка (height: 20px)
-        html += `<tr style="border-bottom: 1px solid #eee; height: 20px; ${isP ? 'background:#fffcf5;' : ''}">
-            <td style="padding: 2px 8px;">${b.shift_date}</td>
-            <td style="padding: 2px 8px;">Бриг. №${b.brigade_id}</td>
-            <td style="padding: 2px 8px;">
-                <strong>${b.displayname || b.user_id}</strong> 
+        html += `<tr style="border-bottom: 1px solid #eee; height: 22px; ${isP ? 'background:#fffcf5;' : ''}">
+            <td style="padding: 2px 8px; overflow: hidden; white-space: nowrap;">${b.shift_date}</td>
+            <td style="padding: 2px 8px; overflow: hidden; white-space: nowrap;">Бриг. №${b.brigade_id}</td>
+            <td style="padding: 2px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <strong title="${b.displayname || b.user_id}">${b.displayname || b.user_id}</strong> 
                 ${isP ? '<span style="color:#e67e22; font-size:10px;">(ожидает)</span>' : ''}
             </td>`;
-        if (isAdmin) {
+       
+		if (isAdmin) {
             html += `<td style="padding: 2px 8px;">
                 ${isP ? `<button class="admin-confirm-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:#2ecc71; color:#fff; border:none; border-radius:2px; cursor:pointer;">ОК</button>` : ''}
                 <button class="admin-delete-btn" data-id="${b.id}" style="font-size:10px; padding:0 4px; background:none; border:none; color:#e74c3c; text-decoration:underline; cursor:pointer;">Удалить</button>
