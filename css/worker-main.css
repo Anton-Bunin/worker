@@ -217,3 +217,15 @@
     background-color: #f8f9fa !important;
   /*  pointer-events: none;  Полностью отключает клики для НЕ админов */
 }
+
+/* Этот блок сделает верхнюю панель синей, а иконки — белыми */
+header#header {
+    background-color: #0082c9 !important;
+}
+
+#header .action-item, 
+#header .logo, 
+#header .header-appname {
+    color: #ffffff !important;
+    filter: none !important;
+}
