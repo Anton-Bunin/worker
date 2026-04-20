@@ -31,7 +31,7 @@ Util::addStyle('worker', 'worker-main');
 	</table>
 
 	<!-- Единый контейнер для списка -->
-	<div id="bookings-list-container" style="margin-top: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; max-width: 100%;"> 
+	<div id="bookings-list-container" style="margin-top: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; max-width: 700px;"> 
 	    <!-- Шапка со встроенным заголовком и фильтрами -->
 	    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 15px; background: #f8f9fa; border-bottom: 1px solid #ddd;">
 	        <h3 style="margin: 0; font-size: 16px; color: #333;">Работа в выходной</h3>
