@@ -43,6 +43,6 @@ Util::addStyle('worker', 'worker-main');
 </div> <!-- Конец #worker -->
 
 <div id="server-data" 
-    data-bookings='<?php p(json_encode($_['bookings'])); ?>' 
+    data-bookings='<?php p(json_encode($_['bookings'] ?? [])); ?>' 
     style="display:none;">
 </div>
